@@ -7,6 +7,10 @@ import streamlit as st
 from pathlib import Path
 import config
 from models.conversation import ConversationState, Message, CoachingFeedback
+from services.language_service import detect_language
+from services.sentiment_service import analyze_sentiment
+from services.intent_service import classify_intent
+from services.risk_service import evaluate_conversation_risk
 
 
 # 1. PAGE CONFIGURATION
@@ -150,12 +154,32 @@ with col_chat:
                         f.write(uploaded_image.getbuffer())
                     saved_image_path = str(img_path)
 
-                # Add customer message to conversation state
+                # 1. Add customer message to conversation state
                 state.add_message("customer", customer_text.strip(), image_path=saved_image_path)
                 
-                # Baseline placeholder guidance (to be connected with AI services in Milestones 2 & 3)
-                state.key_issue = customer_text[:50] + "..." if len(customer_text) > 50 else customer_text
-                state.suggested_response = f"Thank you for contacting {config.COMPANY_NAME}. I understand your concern regarding this and I am here to help you resolve it."
+                # 2. Multilingual & NLP Analysis Engine (Milestone 2)
+                lang_code, lang_name, lang_conf = detect_language(customer_text.strip())
+                state.language = lang_code
+                
+                sentiment_label, sent_conf, _ = analyze_sentiment(customer_text.strip(), language=lang_code)
+                state.sentiment = sentiment_label
+                state.sentiment_confidence = sent_conf
+                
+                intent_label, intent_conf, _ = classify_intent(customer_text.strip(), language=lang_code)
+                state.intent = intent_label
+                state.intent_confidence = intent_conf
+                
+                urgency, escalation_risk, key_issue = evaluate_conversation_risk(state)
+                state.urgency = urgency
+                state.escalation_risk = escalation_risk
+                state.key_issue = key_issue
+
+                # Context-aware default response draft
+                if state.sentiment == "NEGATIVE":
+                    state.suggested_response = f"I am truly sorry for the inconvenience this has caused. I am actively looking into your {state.intent.lower()} right now to ensure this is resolved immediately."
+                else:
+                    state.suggested_response = f"Thank you for contacting {config.COMPANY_NAME}. I will be happy to assist you with your {state.intent.lower()}."
+                
                 st.rerun()
             else:
                 st.warning("Please enter a message or upload an image.")
