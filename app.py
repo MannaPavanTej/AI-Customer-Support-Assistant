@@ -11,6 +11,9 @@ from services.language_service import detect_language
 from services.sentiment_service import analyze_sentiment
 from services.intent_service import classify_intent
 from services.risk_service import evaluate_conversation_risk
+from services.multimodal_service import validate_image, analyze_image
+from services.coaching_service import generate_customer_context_coaching, evaluate_agent_draft
+from services.response_service import generate_suggested_response
 from rag import KnowledgeRetriever
 
 
@@ -82,6 +85,9 @@ if "state" not in st.session_state:
 if "agent_draft" not in st.session_state:
     st.session_state.agent_draft = ""
 
+if "visual_context" not in st.session_state:
+    st.session_state.visual_context = None
+
 state: ConversationState = st.session_state.state
 
 
@@ -100,6 +106,7 @@ with st.sidebar:
     if st.button("🔄 Start New Conversation", use_container_width=True, type="secondary"):
         state.clear()
         st.session_state.agent_draft = ""
+        st.session_state.visual_context = None
         st.rerun()
 
     st.divider()
@@ -181,22 +188,20 @@ with col_chat:
                 state.escalation_risk = escalation_risk
                 state.key_issue = key_issue
 
-                # 3. Grounded Knowledge Retrieval (Milestone 3 RAG)
+                # 3. Multimodal Analysis (Milestone 4)
+                visual_context = None
+                if saved_image_path:
+                    visual_context = analyze_image(saved_image_path, customer_text=customer_text.strip())
+                st.session_state.visual_context = visual_context
+
+                # 4. Grounded Knowledge Retrieval (Milestone 3 RAG)
                 retriever = get_retriever()
                 rag_result = retriever.retrieve(customer_text.strip(), top_k=2)
                 state.retrieved_sources = rag_result["sources"]
 
-                # 4. Context-aware grounded response draft
-                if rag_result["found"] and rag_result["sources"]:
-                    primary_source = rag_result["sources"][0]
-                    state.suggested_response = f"Based on TechCare {primary_source['document']} ({primary_source['section']}):\nI can assist you with your inquiry. "
-                    if state.sentiment == "NEGATIVE":
-                        state.suggested_response = f"I sincerely apologize for the trouble. According to TechCare {primary_source['document']}:\nWe will ensure this is resolved for you promptly."
-                else:
-                    if state.sentiment == "NEGATIVE":
-                        state.suggested_response = f"I am truly sorry for the inconvenience. I am actively reviewing your {state.intent.lower()} to ensure this is resolved immediately."
-                    else:
-                        state.suggested_response = f"Thank you for contacting {config.COMPANY_NAME}. I will be happy to assist you with your {state.intent.lower()}."
+                # 5. Customer Context Coaching & Grounded Suggested Reply (Milestone 4)
+                state.coaching = generate_customer_context_coaching(state)
+                state.suggested_response = generate_suggested_response(state, visual_context=visual_context)
                 
                 st.rerun()
             else:
@@ -261,6 +266,14 @@ with col_guidance:
     # Key Issue Card
     st.markdown(f"**📌 Identified Key Issue:** `{state.key_issue}`")
 
+    # Multimodal Diagnostics Section (Milestone 4)
+    v_ctx = st.session_state.get("visual_context")
+    if v_ctx and v_ctx.get("valid"):
+        with st.expander("📸 Multimodal Visual Diagnostics", expanded=True):
+            st.info(f"**Detected:** {v_ctx.get('detected_element')} (Confidence: {int(v_ctx.get('confidence', 0.8)*100)}%)")
+            st.caption(f"Dimensions: {v_ctx.get('resolution')} | Format: {v_ctx.get('format')}")
+            st.write(v_ctx.get("visual_summary"))
+
     st.divider()
 
     # Knowledge Base / RAG Section
@@ -278,16 +291,24 @@ with col_guidance:
 
     st.divider()
 
-    # Coaching Section
-    st.markdown("#### 💡 AI Live Coaching")
-    if state.coaching:
+    # Coaching Section: Evaluates agent's draft if typed, else shows customer context coaching
+    composer_text = st.session_state.get("agent_composer_textarea", "").strip() or st.session_state.agent_draft.strip()
+    if composer_text:
+        active_coaching = evaluate_agent_draft(composer_text, state)
+        coaching_label = "💡 AI Live Coaching *(Agent Draft Critique)*"
+    else:
+        active_coaching = state.coaching or generate_customer_context_coaching(state)
+        coaching_label = "💡 AI Live Coaching *(Customer Context Guidance)*"
+
+    st.markdown(f"#### {coaching_label}")
+    if active_coaching:
         c_col1, c_col2, c_col3 = st.columns(3)
-        c_col1.metric("Tone", f"{state.coaching.tone_score}/10")
-        c_col2.metric("Empathy", f"{state.coaching.empathy_score}/10")
-        c_col3.metric("Clarity", f"{state.coaching.clarity_score}/10")
+        c_col1.metric("Tone", f"{active_coaching.tone_score}/10")
+        c_col2.metric("Empathy", f"{active_coaching.empathy_score}/10")
+        c_col3.metric("Clarity", f"{active_coaching.clarity_score}/10")
         st.markdown(f"""
         <div class="coaching-card">
-            <strong>Coaching Tip:</strong> {state.coaching.coaching_tip}
+            <strong>Coaching Tip:</strong> {active_coaching.coaching_tip}
         </div>
         """, unsafe_allow_html=True)
 
