@@ -11,6 +11,13 @@ from services.language_service import detect_language
 from services.sentiment_service import analyze_sentiment
 from services.intent_service import classify_intent
 from services.risk_service import evaluate_conversation_risk
+from rag import KnowledgeRetriever
+
+
+@st.cache_resource
+def get_retriever() -> KnowledgeRetriever:
+    """Cached singleton instance of the FAISS Knowledge Retriever."""
+    return KnowledgeRetriever()
 
 
 # 1. PAGE CONFIGURATION
@@ -174,11 +181,22 @@ with col_chat:
                 state.escalation_risk = escalation_risk
                 state.key_issue = key_issue
 
-                # Context-aware default response draft
-                if state.sentiment == "NEGATIVE":
-                    state.suggested_response = f"I am truly sorry for the inconvenience this has caused. I am actively looking into your {state.intent.lower()} right now to ensure this is resolved immediately."
+                # 3. Grounded Knowledge Retrieval (Milestone 3 RAG)
+                retriever = get_retriever()
+                rag_result = retriever.retrieve(customer_text.strip(), top_k=2)
+                state.retrieved_sources = rag_result["sources"]
+
+                # 4. Context-aware grounded response draft
+                if rag_result["found"] and rag_result["sources"]:
+                    primary_source = rag_result["sources"][0]
+                    state.suggested_response = f"Based on TechCare {primary_source['document']} ({primary_source['section']}):\nI can assist you with your inquiry. "
+                    if state.sentiment == "NEGATIVE":
+                        state.suggested_response = f"I sincerely apologize for the trouble. According to TechCare {primary_source['document']}:\nWe will ensure this is resolved for you promptly."
                 else:
-                    state.suggested_response = f"Thank you for contacting {config.COMPANY_NAME}. I will be happy to assist you with your {state.intent.lower()}."
+                    if state.sentiment == "NEGATIVE":
+                        state.suggested_response = f"I am truly sorry for the inconvenience. I am actively reviewing your {state.intent.lower()} to ensure this is resolved immediately."
+                    else:
+                        state.suggested_response = f"Thank you for contacting {config.COMPANY_NAME}. I will be happy to assist you with your {state.intent.lower()}."
                 
                 st.rerun()
             else:
@@ -249,10 +267,14 @@ with col_guidance:
     st.markdown("#### 📚 Grounded Knowledge Base (TechCare RAG)")
     if state.retrieved_sources:
         for idx, src in enumerate(state.retrieved_sources, 1):
-            with st.expander(f"Source {idx}: {src.get('document', 'Knowledge Doc')}"):
-                st.write(src.get("text", "No text available"))
+            with st.expander(f"📄 {src.get('document', 'Knowledge Doc')} — {src.get('section', 'General')} (Match: {int(src.get('similarity_score', 0)*100)}%)"):
+                st.caption(f"📁 Category: `{src.get('category', 'general').capitalize()}` | Source File: `{src.get('source_file', '')}`")
+                st.markdown(src.get("text", "No text available"))
     else:
-        st.caption("No specific policy retrieved yet. RAG retrieval will automatically activate when a customer query is processed.")
+        if state.history:
+            st.warning("⚠️ No relevant company information was found in the knowledge base. Please verify this information manually.")
+        else:
+            st.caption("No policy retrieved yet. RAG retrieval will automatically activate when a customer query is received.")
 
     st.divider()
 
