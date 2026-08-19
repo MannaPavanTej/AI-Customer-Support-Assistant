@@ -15,12 +15,19 @@ from services.multimodal_service import validate_image, analyze_image
 from services.coaching_service import generate_customer_context_coaching, evaluate_agent_draft
 from services.response_service import generate_suggested_response
 from rag import KnowledgeRetriever
+from database import SupportRepository
 
 
 @st.cache_resource
 def get_retriever() -> KnowledgeRetriever:
     """Cached singleton instance of the FAISS Knowledge Retriever."""
     return KnowledgeRetriever()
+
+
+@st.cache_resource
+def get_repository() -> SupportRepository:
+    """Cached singleton instance of the SQLite Support Repository."""
+    return SupportRepository()
 
 
 # 1. PAGE CONFIGURATION
@@ -72,6 +79,11 @@ st.markdown("""
 
 
 # 2. SESSION STATE INITIALIZATION
+repo = get_repository()
+
+if "session_id" not in st.session_state:
+    st.session_state.session_id = repo.create_session()
+
 if "state" not in st.session_state:
     st.session_state.state = ConversationState()
     # Initialize with a default coaching card for demonstration
@@ -91,26 +103,64 @@ if "visual_context" not in st.session_state:
 state: ConversationState = st.session_state.state
 
 
-# 3. SIDEBAR: SESSION CONTROLS & INFO
+# 3. SIDEBAR: SESSION CONTROLS & PERSISTENT HISTORY
 with st.sidebar:
     st.title("🎧 TechCare Agent Hub")
     st.caption("Human-in-the-Loop Support Co-Pilot")
     st.divider()
 
-    st.subheader("Session Information")
+    st.subheader("Active Session")
+    st.code(st.session_state.session_id, language="text")
     st.write(f"**Total Messages:** {len(state.history)}")
     st.write(f"**Primary Language:** {config.SUPPORTED_LANGUAGES.get(state.language, 'English')}")
     st.write(f"**Company:** {config.COMPANY_NAME}")
     
-    st.divider()
     if st.button("🔄 Start New Conversation", use_container_width=True, type="secondary"):
+        st.session_state.session_id = repo.create_session()
         state.clear()
         st.session_state.agent_draft = ""
         st.session_state.visual_context = None
         st.rerun()
 
     st.divider()
-    st.info("💡 **Architectural Principle:** The AI acts as an advisor. The human agent remains in full control of all customer communications.")
+
+    # Past Sessions & SQLite History Explorer
+    st.subheader("📜 Past Support Tickets")
+    past_sessions = repo.get_all_sessions(limit=15)
+    if past_sessions:
+        session_options = {s["session_id"]: f"{s['session_id']} ({s['created_at'][:16]})" for s in past_sessions}
+        selected_sid = st.selectbox(
+            "Select Past Ticket:",
+            options=list(session_options.keys()),
+            format_func=lambda sid: session_options[sid]
+        )
+
+        if selected_sid:
+            with st.expander("🔍 View Ticket Audit Transcript"):
+                session_logs = repo.get_session_logs(selected_sid)
+                if session_logs:
+                    for l in session_logs:
+                        st.markdown(f"**👤 Customer:** {l['customer_message']}")
+                        st.markdown(f"**🎧 Agent:** {l['agent_message']}")
+                        st.caption(f"Tone: {l['tone_score']}/10 | Empathy: {l['empathy_score']}/10 | Clarity: {l['clarity_score']}/10 | Intent: `{l['intent']}`")
+                        st.divider()
+                else:
+                    st.caption("No message turns recorded for this ticket yet.")
+
+            # Markdown Transcript Export Download
+            transcript_md = repo.export_session_markdown(selected_sid)
+            st.download_button(
+                label="📥 Export Transcript (.md)",
+                data=transcript_md,
+                file_name=f"transcript_{selected_sid}.md",
+                mime="text/markdown",
+                use_container_width=True
+            )
+    else:
+        st.caption("No past sessions found in the database.")
+
+    st.divider()
+    st.info("💡 **Persistence Principle:** Active in-memory session state is decoupled from SQLite persistent audit history.")
 
 
 # 4. MAIN APPLICATION HEADER
@@ -344,9 +394,18 @@ btn_col1, btn_col2, _ = st.columns([1.5, 1.5, 5])
 with btn_col1:
     if st.button("🚀 Send Response to Customer", type="primary", use_container_width=True):
         if agent_text_input.strip():
+            # 1. Add agent message to active session state
             state.add_message("agent", agent_text_input.strip())
+            
+            # 2. Persist turn and full AI analytics to SQLite database
+            repo.log_turn(
+                session_id=st.session_state.session_id,
+                state=state,
+                agent_message=agent_text_input.strip()
+            )
+
             st.session_state.agent_draft = ""
-            st.success("Response sent to customer successfully.")
+            st.success("Response sent to customer and logged to database.")
             st.rerun()
         else:
             st.warning("Cannot send an empty response.")
