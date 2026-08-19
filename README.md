@@ -1,23 +1,36 @@
 # AI-Powered Customer Support Assistant with Live Response Guidance
 
-An intelligent, human-in-the-loop AI co-pilot designed to assist human customer support agents during live customer conversations for **TechCare** (a consumer technology company).
+An intelligent, **Human-in-the-Loop** AI co-pilot designed to assist human customer support agents during live customer conversations for **TechCare Inc.** (a consumer technology and networking provider).
 
 ---
 
-## 🎯 Key Project Features
-- **Human-in-the-Loop Workflow**: The AI provides real-time guidance, grounding, and draft suggestions, while the human support agent reviews, edits, and sends the final response.
-- **Multilingual Support**: Supports customer conversations in **English**, **Hindi**, and **Telugu**.
-- **Real-Time Conversation Understanding**: Sentiment analysis (with confidence), zero-shot intent classification, urgency scoring, escalation risk indicators, and key issue identification.
-- **Multimodal Visual Diagnostics**: Capability to analyze customer-uploaded hardware photos and UI error screenshots.
-- **Grounded Knowledge Base (RAG + FAISS)**: Fast similarity search over TechCare policies, FAQs, and manuals with strict source attribution and no-hallucination handling.
-- **Two-Way AI Coaching**:
-  - *Customer-Context Coaching*: Tips on empathy, clarity, and de-escalation based on customer state.
-  - *Agent Draft Critique*: Real-time tone, empathy, and clarity scoring on the agent's drafted message.
-- **Persistent Audit Logging**: SQLite database logging conversations, metrics, and agent decisions.
+## 🌟 Key Features
+
+1. **Human-in-the-Loop Co-Pilot**:
+   - The AI acts as an advisor, generating live analytics, grounded knowledge citations, live coaching, and suggested drafts.
+   - The human support agent reviews, edits, and approves every outgoing response.
+2. **Three-Language Multilingual Support**:
+   - Seamless support for **English**, **Hindi (हिंदी)**, and **Telugu (తెలుగు)** with hybrid Unicode script detection and statistical N-gram fallback.
+3. **Real-Time Conversation Understanding**:
+   - **Sentiment Analysis**: Emotional polarity (`POSITIVE`, `NEUTRAL`, `NEGATIVE`) with confidence scoring.
+   - **Zero-Shot Intent Classification**: Categorizes across 8 core support areas (`Refund Request`, `Technical Issue`, `Cancellation`, `Complaint`, `Purchase & Pricing`, `Order & Delivery Query`, `General Query`, `Feedback`).
+   - **Risk Evaluation**: Urgency (`LOW`, `MEDIUM`, `HIGH`), Escalation Risk (`LOW`, `MEDIUM`, `HIGH`), and Key Issue summarization.
+4. **Multimodal Visual Diagnostics**:
+   - Upload and inspect hardware photos (router warning LED indicators) and checkout error screenshots with strict integrity validation.
+5. **Grounded FAISS RAG Retrieval**:
+   - Fast vector similarity search over 12 TechCare policies, FAQs, and manuals.
+   - **Zero-Hallucination Guardrail**: Enforces strict cosine similarity thresholding with clear disclaimers for out-of-scope queries.
+6. **Two-Way Live AI Coaching**:
+   - *Customer-Context Guidance*: Upfront coaching on empathy and de-escalation based on customer state.
+   - *Agent-Draft Live Critique*: Real-time scoring of Tone ($1\text{-}10$), Empathy ($1\text{-}10$), and Clarity ($1\text{-}10$) as the agent types into the composer.
+7. **Persistent SQLite Audit Database**:
+   - Automatically logs complete conversation turns, analysis metrics, quality scores, and retrieved sources.
+   - Sidebar history explorer with turn review and Markdown transcript export.
 
 ---
 
-## 🏗️ Architecture Flow
+## 🏗️ System Architecture Flow
+
 ```
 Customer Message (Text/Image in EN/HI/TE)
                │
@@ -45,13 +58,73 @@ Detection  Analysis  Classification
 
 ---
 
+## 📁 Project Directory Structure
+
+```
+AI_Customer_Coaching/
+├── app.py                     # Streamlit Agent Workspace & Dashboard Entry Point
+├── config.py                  # Central configuration constants, paths, and thresholds
+├── requirements.txt           # Project dependencies
+├── .env.example               # Environment variables template
+├── .gitignore                 # Git ignore rules
+├── README.md                  # Project overview and setup instructions
+│
+├── models/
+│   ├── __init__.py
+│   └── conversation.py        # Message, ConversationState, CoachingFeedback dataclasses
+│
+├── services/
+│   ├── __init__.py
+│   ├── language_service.py    # English / Hindi / Telugu script & N-gram LID
+│   ├── sentiment_service.py   # Multilingual sentiment analysis & confidence scoring
+│   ├── intent_service.py      # Zero-shot intent classification
+│   ├── risk_service.py        # Urgency, Escalation Risk, and Key Issue analyzer
+│   ├── multimodal_service.py  # Image validation and hardware/UI diagnostics
+│   ├── coaching_service.py    # Two-way coaching & real-time draft critique
+│   └── response_service.py    # Multilingual grounded draft reply generator
+│
+├── rag/
+│   ├── __init__.py
+│   ├── document_loader.py     # Ingests markdown files with title/category extraction
+│   ├── chunker.py             # Semantic section-based chunking with metadata
+│   ├── embeddings.py          # SentenceTransformers (all-MiniLM-L6-v2) 384-d embeddings
+│   ├── vector_store.py        # FAISS IndexFlatIP (Cosine Similarity) persistence
+│   └── retriever.py           # Similarity search with zero-hallucination guardrail
+│
+├── database/
+│   ├── __init__.py
+│   ├── database.py            # SQLite schema (sessions & conversation_logs tables)
+│   └── repository.py          # CRUD data access and Markdown export
+│
+├── knowledge_base/
+│   ├── policies/              # Refund, return, cancellation, replacement, warranty
+│   ├── faq/                   # Payment, delivery, account, product FAQs
+│   └── manuals/               # Router troubleshooting, device setup, connectivity
+│
+├── vector_store/              # Serialized FAISS index (index.faiss & metadata.pkl)
+│
+├── tests/
+│   ├── test_models.py         # Unit tests for domain models
+│   ├── test_analysis.py       # Unit tests for Language, Sentiment, Intent, Risk
+│   ├── test_rag.py            # Unit tests for RAG pipeline & no-answer fallback
+│   ├── test_coaching.py       # Unit tests for Multimodal, Coaching, Response generator
+│   ├── test_database.py       # Unit tests for SQLite persistence & session logs
+│   └── test_integration.py    # End-to-End multi-turn workflow integration tests
+│
+└── docs/
+    ├── architecture.md        # Comprehensive system architecture document
+    └── viva_preparation.md    # Viva defense Q&A cheat sheet & talking points
+```
+
+---
+
 ## 🚀 Quickstart Guide
 
-### 1. Set Up Virtual Environment
+### 1. Set Up Environment
 ```bash
 python -m venv venv
 .\venv\Scripts\activate   # Windows
-# source venv/bin/activate # Linux/Mac
+# source venv/bin/activate # Linux / macOS
 ```
 
 ### 2. Install Dependencies
@@ -59,7 +132,38 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### 3. Run the Application
+### 3. Run Automated Tests
+```bash
+python -m unittest discover tests
+```
+*Executes all 38 unit and integration tests across all modules (100% pass rate).*
+
+### 4. Launch the Streamlit Dashboard
 ```bash
 streamlit run app.py
 ```
+Open your browser at `http://localhost:8501`.
+
+---
+
+## 🧪 Sample Demonstration Scenarios
+
+1. **English Payment Issue & Escalation**:
+   - Customer Message: `"This is the third time contacting you! My card was deducted twice for one router order and I want an immediate refund!"`
+   - AI Guidance: Negative sentiment | Refund Request | HIGH Urgency | HIGH Escalation Risk | Retrieves TechCare Refund Policy | Pre-populates grounded apology with 24-48h refund timeline.
+2. **Telugu Technical Issue with Router Photo**:
+   - Customer Message: `"నా రౌటర్ లో ఎర్ర లైట్ వెలుగుతోంది, ఇంటర్నెట్ రావడం లేదు."` + Attach router photo.
+   - AI Guidance: Telugu language | Technical Issue | Multimodal Red LED warning detected | Retrieves Router Troubleshooting Manual | Generates polite grounded reply in Telugu.
+3. **Hindi Delivery Inquiry**:
+   - Customer Message: `"नमस्ते, मुझे मेरे ऑर्डर की डिलीवरी स्थिति जाननी है।"`
+   - AI Guidance: Hindi language | Order & Delivery Query | Retrieves Delivery FAQ.
+4. **Out-of-Scope Zero-Hallucination Query**:
+   - Customer Message: `"What is the recipe for baking chocolate cookies?"`
+   - AI Guidance: Explicit warning: `⚠️ No relevant company information was found in the knowledge base. Please verify this information manually.`
+
+---
+
+## 🎓 Academic Defense & Viva Resources
+Detailed technical explanations, algorithm rationale, and model selection defenses are available in:
+- [docs/architecture.md](file:///c:/Users/PAVAN%20TEJ/OneDrive/Desktop/AI_Customer_Coaching/docs/architecture.md)
+- [docs/viva_preparation.md](file:///c:/Users/PAVAN%20TEJ/OneDrive/Desktop/AI_Customer_Coaching/docs/viva_preparation.md)

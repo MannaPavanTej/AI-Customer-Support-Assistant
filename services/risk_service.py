@@ -85,7 +85,7 @@ def evaluate_conversation_risk(state: ConversationState) -> Tuple[str, str, str]
     if customer_message_count >= 4 and state.sentiment == "NEGATIVE":
         escalation_points += 2
 
-    if escalation_points >= 3:
+    if escalation_points >= 2:
         escalation_risk = "HIGH"
     elif escalation_points >= 1:
         escalation_risk = "MEDIUM"
