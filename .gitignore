@@ -1,0 +1,32 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Environment Variables & Secrets
+.env
+*.env.local
+
+# Streamlit run cache
+.streamlit/
+
+# Database files & generated vector indices
+*.db
+*.sqlite3
+vector_store/index.faiss
+vector_store/index.pkl
+
+# Uploaded scratch images
+scratch/
+temp_uploads/
+
+# IDE files
+.vscode/
+.idea/
