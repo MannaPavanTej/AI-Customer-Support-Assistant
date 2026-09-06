@@ -76,20 +76,22 @@ def chunk_documents(documents: List[Document], max_chunk_chars: int = 500) -> Li
             if not body:
                 body = clean_sec
 
-            # Create chunk
-            chunk_id = f"{doc.source_file.replace('.', '_')}_{chunk_idx}"
-            chunk_text = f"Document: {doc.title}\nSection: {section_title}\n\n{body}"
+            # Keep retrieval units bounded while preserving paragraph boundaries.
+            paragraphs = [p.strip() for p in re.split(r"\n\s*\n", body) if p.strip()]
+            parts, current = [], ""
+            for paragraph in paragraphs:
+                if current and len(current) + len(paragraph) + 2 > max_chunk_chars:
+                    parts.append(current)
+                    current = paragraph
+                else:
+                    current = f"{current}\n\n{paragraph}".strip()
+            if current:
+                parts.append(current)
 
-            chunks.append(
-                Chunk(
-                    chunk_id=chunk_id,
-                    document_title=doc.title,
-                    category=doc.category,
-                    source_file=doc.source_file,
-                    section_title=section_title,
-                    text=chunk_text
-                )
-            )
-            chunk_idx += 1
+            for part in parts or [body]:
+                chunk_id = f"{doc.source_file.replace('.', '_')}_{chunk_idx}"
+                chunk_text = f"Document: {doc.title}\nSection: {section_title}\n\n{part}"
+                chunks.append(Chunk(chunk_id, doc.title, doc.category, doc.source_file, section_title, chunk_text))
+                chunk_idx += 1
 
     return chunks

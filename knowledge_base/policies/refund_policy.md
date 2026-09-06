@@ -1,9 +1,9 @@
-# TechCare Refund Policy
+# Nexora Technologies Refund Policy
 
 ## Eligibility for Refund
 Customers are eligible for a full refund under the following conditions:
 1. The order was cancelled prior to shipment dispatch.
-2. A return was approved and the physical item was inspected at the TechCare logistics center.
+2. A return was approved and the physical item was inspected at the Nexora Technologies logistics center.
 3. A duplicate payment was deducted for a single transaction.
 
 ## Refund Timelines & Processing

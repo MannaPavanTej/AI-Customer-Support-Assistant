@@ -1,5 +1,5 @@
 """
-End-to-End Integration Tests for TechCare AI Customer Support Assistant.
+End-to-End Integration Tests for Nexora Technologies AI Customer Support Assistant.
 Tests complete multi-turn conversational workflows across English, Telugu, Hindi, RAG retrieval, Multimodal diagnostics, Coaching, and Persistence.
 """
 
@@ -85,7 +85,7 @@ class TestEndToEndWorkflows(unittest.TestCase):
         self.assertIn("empathy", state.coaching.coaching_tip.lower())
 
         suggested_reply = generate_suggested_response(state)
-        self.assertIn("TechCare Refund Policy", suggested_reply)
+        self.assertIn("Nexora Technologies Refund Policy", suggested_reply)
         self.assertIn("apologize", suggested_reply.lower())
 
         # 5. Agent Review & Evaluation
@@ -135,7 +135,7 @@ class TestEndToEndWorkflows(unittest.TestCase):
 
         suggested_reply = generate_suggested_response(state, visual_context=visual_ctx)
         self.assertIn("నమస్కారం", suggested_reply)
-        self.assertIn("TechCare", suggested_reply)
+        self.assertIn("Nexora Technologies", suggested_reply)
 
         # 5. Persistent Logging
         log_id = self.repo.log_turn(session_id, state, suggested_reply, image_path=str(self.test_img_path))

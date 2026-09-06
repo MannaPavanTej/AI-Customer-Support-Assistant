@@ -22,6 +22,8 @@ def get_connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
     path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(path))
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON;")
+    conn.execute("PRAGMA busy_timeout = 5000;")
     return conn
 
 
@@ -42,7 +44,7 @@ def init_db(db_path: Optional[Path] = None) -> None:
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         primary_language TEXT DEFAULT 'en',
-        status TEXT DEFAULT 'RESOLVED',
+        status TEXT DEFAULT 'OPEN',
         total_messages INTEGER DEFAULT 0
     );
     """)
@@ -77,6 +79,26 @@ def init_db(db_path: Optional[Path] = None) -> None:
     # Create Indexes for fast querying
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_logs_session ON conversation_logs (session_id);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON conversation_logs (timestamp);")
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        role TEXT NOT NULL CHECK(role IN ('admin', 'agent', 'viewer')),
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS audit_events (
+        event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        username TEXT,
+        action TEXT NOT NULL,
+        details TEXT
+    );
+    """)
 
     conn.commit()
     conn.close()

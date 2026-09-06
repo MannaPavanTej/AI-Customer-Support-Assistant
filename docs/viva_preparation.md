@@ -1,7 +1,7 @@
 # Viva & Technical Defense Preparation Guide
 
 ## 🎯 1. 30-Second Project Elevator Pitch
-> *"Our project is an AI-powered customer support assistant designed to provide live response guidance to human support agents. The system detects the customer's language across English, Hindi, and Telugu, analyzes sentiment and zero-shot intent, and evaluates urgency and escalation risk. It optionally understands customer-uploaded hardware photos and screenshots using multimodal diagnostics. It then uses RAG with a FAISS vector database to retrieve grounded TechCare company knowledge. The retrieved knowledge and conversation context are used to provide live coaching feedback on Tone, Empathy, and Clarity, as well as a pre-generated draft reply. The human agent retains complete control to review, edit, and approve the response, while SQLite maintains full persistent audit logs."*
+> *"AgentGuide AI by Nexora Technologies is an AI-powered customer-support assistant designed to provide live response guidance to human support agents. The system detects the customer's language across English, Hindi, and Telugu, analyzes sentiment and zero-shot intent, and evaluates urgency and escalation risk. It optionally understands customer-uploaded hardware photos and screenshots using multimodal diagnostics. It then uses RAG with a FAISS vector database to retrieve grounded Nexora Technologies knowledge. The retrieved knowledge and conversation context are used to provide live coaching feedback on Tone, Empathy, and Clarity, as well as a pre-generated draft reply. The human agent retains complete control to review, edit, and approve the response, while SQLite maintains full persistent audit logs."*
 
 ---
 
@@ -49,7 +49,7 @@ $$\text{Cosine Similarity}(u, v) = \frac{u \cdot v}{\|u\|_2 \|v\|_2} = u \cdot v
 
 ### Q6: How does the system guarantee Zero Policy Hallucination?
 **Answer:**  
-We enforce a strict **Relevance Threshold** ($\ge 0.35$ cosine similarity). If a customer asks a question outside TechCare's knowledge base (e.g. *"What is the recipe for cookies?"*), the maximum similarity score drops below the threshold. Instead of guessing, the retriever explicitly triggers a **No-Answer Fallback**: *"No relevant company information was found in the TechCare knowledge base. Please verify this information manually."*
+We enforce a strict **Relevance Threshold** ($\ge 0.35$ cosine similarity). If a customer asks a question outside the Nexora Technologies knowledge base (e.g. *"What is the recipe for cookies?"*), the maximum similarity score drops below the threshold. Instead of guessing, the retriever explicitly triggers a **No-Answer Fallback**: *"No relevant company information was found in the Nexora Technologies knowledge base. Please verify this information manually."*
 
 ---
 

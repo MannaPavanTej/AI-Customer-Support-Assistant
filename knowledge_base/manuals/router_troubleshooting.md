@@ -1,4 +1,4 @@
-# TechCare Router Troubleshooting & LED Diagnostics
+# Nexora Technologies Router Troubleshooting & LED Diagnostics
 
 ## Understanding LED Indicator Lights
 - **Solid Green / White**: Normal operation, internet connection active.

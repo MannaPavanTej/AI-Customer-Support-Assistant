@@ -1,7 +1,7 @@
-# TechCare AI Support Assistant — System Architecture Document
+# AgentGuide AI by Nexora Technologies — System Architecture
 
 ## 1. Executive Summary
-The **AI-Powered Customer Support Assistant with Live Response Guidance** is an intelligent co-pilot designed to assist human customer support agents in handling customer queries for **TechCare Inc.** (a consumer technology and smart networking provider).
+**AgentGuide AI** is an intelligent co-pilot by **Nexora Technologies**, designed to assist human customer-support agents.
 
 The system operates on a **Human-in-the-Loop** model: rather than replacing human agents with an autonomous chatbot, the AI analyzes incoming customer messages in real-time, retrieves grounded company policies via Retrieval-Augmented Generation (RAG), scores agent drafts on quality (Tone, Empathy, Clarity), and provides grounded suggested responses.
 
@@ -49,7 +49,7 @@ The system operates on a **Human-in-the-Loop** model: rather than replacing huma
                      └────┬───┘
                           │
                  FAISS Vector Index (RAG)
-                 (TechCare Policies, FAQs, Manuals)
+                 (Nexora Technologies Policies, FAQs, Manuals)
                           │
                  ┌────────┴────────┐
                  ▼                 ▼
@@ -90,7 +90,7 @@ The system operates on a **Human-in-the-Loop** model: rather than replacing huma
 - `response_service.py`: Grounded suggested response generation in English, Hindi, and Telugu.
 
 ### 3.3 Retrieval-Augmented Generation (`rag/`)
-- `document_loader.py`: Ingests 12 TechCare markdown documents across Policies, FAQs, and Manuals.
+- `document_loader.py`: Ingests 12 Nexora Technologies markdown documents across Policies, FAQs, and Manuals.
 - `chunker.py`: Splits documents by section headers (`##`), preserving document title and section metadata.
 - `embeddings.py`: Uses `SentenceTransformers` (`all-MiniLM-L6-v2`) generating 384-dimensional unit-normalized embeddings.
 - `vector_store.py`: Local vector index using `faiss.IndexFlatIP` (Exact Inner Product = Cosine Similarity).

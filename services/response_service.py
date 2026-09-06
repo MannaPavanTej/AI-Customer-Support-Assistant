@@ -4,7 +4,7 @@ Grounded Suggested Response Generation Service.
 Synthesizes:
 - Customer intent & sentiment
 - Detected language (English, Hindi, Telugu)
-- Grounded TechCare knowledge base retrieved context
+- Grounded Nexora Technologies knowledge base retrieved context
 - Visual diagnostics (if image was provided)
 """
 
@@ -50,7 +50,7 @@ def generate_suggested_response(
             top_src = sources[0]
             body = (
                 f"{greeting} {diag}\n\n"
-                f"TechCare {top_src['document']} के अनुसार:\n"
+                f"{top_src['document']} के अनुसार:\n"
                 f"हम आपके {intent} को जल्द से जल्द हल करने में आपकी सहायता करेंगे। "
                 f"कृपया आवश्यक विवरण साझा करें ताकि हम तुरंत आगे की कार्रवाई कर सकें।"
             )
@@ -79,7 +79,7 @@ def generate_suggested_response(
             top_src = sources[0]
             body = (
                 f"{greeting} {diag}\n\n"
-                f"TechCare {top_src['document']} ప్రకారం:\n"
+                f"{top_src['document']} ప్రకారం:\n"
                 f"మీ సమస్యను వీలైనంత త్వరగా పరిష్కరించడానికి మేము సిద్ధంగా ఉన్నాము. "
                 f"దయచేసి సంబంధిత వివరాలు తెలపండి, మేము వెంటనే సహాయం చేస్తాము."
             )
@@ -105,7 +105,7 @@ def generate_suggested_response(
     if sources:
         top_src = sources[0]
         policy_note = (
-            f"\n\nAccording to the TechCare **{top_src['document']}** (*{top_src['section']}*):\n"
+            f"\n\nAccording to **{top_src['document']}** (*{top_src['section']}*):\n"
             f"We are actively working on resolving your **{intent}**. "
         )
         if "Refund" in top_src["document"] or "Duplicate" in top_src["section"]:

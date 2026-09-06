@@ -1,5 +1,5 @@
 """
-Document loader module for the TechCare knowledge base.
+Document loader module for the Nexora Technologies knowledge base.
 Recursively reads markdown (.md) and text (.txt) files and creates Document objects with metadata.
 """
 

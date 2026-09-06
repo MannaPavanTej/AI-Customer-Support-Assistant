@@ -21,11 +21,13 @@ ENV/
 *.db
 *.sqlite3
 vector_store/index.faiss
-vector_store/index.pkl
+vector_store/metadata.json
+vector_store/metadata.pkl
 
 # Uploaded scratch images
 scratch/
 temp_uploads/
+logs/
 
 # IDE files
 .vscode/

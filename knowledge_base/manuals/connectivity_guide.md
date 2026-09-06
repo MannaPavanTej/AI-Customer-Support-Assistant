@@ -1,4 +1,4 @@
-# TechCare Wi-Fi Speed & Connectivity Guide
+# Nexora Technologies Wi-Fi Speed & Connectivity Guide
 
 ## Optimizing Wi-Fi Performance
 - **Router Placement**: Position the router in an elevated, central location in your home, away from thick concrete walls, metal cabinets, and microwave ovens.
@@ -8,6 +8,6 @@
 
 ## Resolving Channel Congestion
 If Wi-Fi speeds drop intermittently:
-1. Open the TechCare Connect App and navigate to Wi-Fi Optimization.
+1. Open the Nexora Technologies Connect App and navigate to Wi-Fi Optimization.
 2. Tap 'Auto-Scan Channels'. The app will select the least congested wireless frequency.
 3. Restart the router to apply optimal bandwidth channels.

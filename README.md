@@ -1,6 +1,6 @@
-# AI-Powered Customer Support Assistant with Live Response Guidance
+# AgentGuide AI — Customer Support Intelligence Platform
 
-An intelligent, **Human-in-the-Loop** AI co-pilot designed to assist human customer support agents during live customer conversations for **TechCare Inc.** (a consumer technology and networking provider).
+**AgentGuide AI** is an intelligent, human-in-the-loop co-pilot by **Nexora Technologies**, designed to assist support agents during live customer conversations.
 
 ---
 
@@ -18,8 +18,8 @@ An intelligent, **Human-in-the-Loop** AI co-pilot designed to assist human custo
 4. **Multimodal Visual Diagnostics**:
    - Upload and inspect hardware photos (router warning LED indicators) and checkout error screenshots with strict integrity validation.
 5. **Grounded FAISS RAG Retrieval**:
-   - Fast vector similarity search over 12 TechCare policies, FAQs, and manuals.
-   - **Zero-Hallucination Guardrail**: Enforces strict cosine similarity thresholding with clear disclaimers for out-of-scope queries.
+   - Fast vector similarity search over 12 Nexora Technologies policies, FAQs, and manuals.
+   - **Grounded-response guardrail**: Enforces cosine-similarity thresholding and a clear manual-verification fallback for out-of-scope queries.
 6. **Two-Way Live AI Coaching**:
    - *Customer-Context Guidance*: Upfront coaching on empathy and de-escalation based on customer state.
    - *Agent-Draft Live Critique*: Real-time scoring of Tone ($1\text{-}10$), Empathy ($1\text{-}10$), and Clarity ($1\text{-}10$) as the agent types into the composer.
@@ -134,9 +134,9 @@ pip install -r requirements.txt
 
 ### 3. Run Automated Tests
 ```bash
-python -m unittest discover tests
+python -m unittest discover -s tests -v
 ```
-*Executes all 38 unit and integration tests across all modules (100% pass rate).*
+The suite contains 38 unit and integration tests. It runs fully offline: when the optional MiniLM model has not been cached locally, RAG uses a deterministic token-hash fallback. For stronger semantic retrieval in deployment, cache `all-MiniLM-L6-v2` during image/build setup.
 
 ### 4. Launch the Streamlit Dashboard
 ```bash
@@ -150,14 +150,14 @@ Open your browser at `http://localhost:8501`.
 
 1. **English Payment Issue & Escalation**:
    - Customer Message: `"This is the third time contacting you! My card was deducted twice for one router order and I want an immediate refund!"`
-   - AI Guidance: Negative sentiment | Refund Request | HIGH Urgency | HIGH Escalation Risk | Retrieves TechCare Refund Policy | Pre-populates grounded apology with 24-48h refund timeline.
+   - AI Guidance: Negative sentiment | Refund Request | HIGH Urgency | HIGH Escalation Risk | Retrieves Nexora Technologies Refund Policy | Pre-populates grounded apology with 24-48h refund timeline.
 2. **Telugu Technical Issue with Router Photo**:
    - Customer Message: `"నా రౌటర్ లో ఎర్ర లైట్ వెలుగుతోంది, ఇంటర్నెట్ రావడం లేదు."` + Attach router photo.
    - AI Guidance: Telugu language | Technical Issue | Multimodal Red LED warning detected | Retrieves Router Troubleshooting Manual | Generates polite grounded reply in Telugu.
 3. **Hindi Delivery Inquiry**:
    - Customer Message: `"नमस्ते, मुझे मेरे ऑर्डर की डिलीवरी स्थिति जाननी है।"`
    - AI Guidance: Hindi language | Order & Delivery Query | Retrieves Delivery FAQ.
-4. **Out-of-Scope Zero-Hallucination Query**:
+4. **Out-of-Scope Guardrail Query**:
    - Customer Message: `"What is the recipe for baking chocolate cookies?"`
    - AI Guidance: Explicit warning: `⚠️ No relevant company information was found in the knowledge base. Please verify this information manually.`
 
@@ -167,3 +167,11 @@ Open your browser at `http://localhost:8501`.
 Detailed technical explanations, algorithm rationale, and model selection defenses are available in:
 - [docs/architecture.md](file:///c:/Users/PAVAN%20TEJ/OneDrive/Desktop/AI_Customer_Coaching/docs/architecture.md)
 - [docs/viva_preparation.md](file:///c:/Users/PAVAN%20TEJ/OneDrive/Desktop/AI_Customer_Coaching/docs/viva_preparation.md)
+
+---
+
+## Production Readiness Notes
+
+This repository is a human-in-the-loop support prototype. Do not use it with real customer data until authentication, role-based access, encrypted storage, retention/deletion policies, and centralized monitoring are in place. Uploaded images are stored temporarily and automatically removed after 24 hours. The visual diagnostic feature is a lightweight image heuristic, not a certified device or screenshot recognition model.
+
+The local foundation for those controls is included: set `APP_ENV=production`, `AUTH_ENABLED=true`, administrator credentials, and a Fernet `DATA_ENCRYPTION_KEY` in `.env`. Production startup deliberately stops if any of these settings are missing.

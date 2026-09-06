@@ -69,7 +69,7 @@ class TestCoachingAndMultimodal(unittest.TestCase):
     def test_evaluate_agent_draft_high_quality(self):
         state = ConversationState()
         state.sentiment = "NEGATIVE"
-        agent_draft = "Thank you for contacting TechCare. I sincerely apologize for the inconvenience. I will process your refund within 24 to 48 hours."
+        agent_draft = "Thank you for contacting Nexora Technologies. I sincerely apologize for the inconvenience. I will process your refund within 24 to 48 hours."
         
         feedback = evaluate_agent_draft(agent_draft, state)
         self.assertGreaterEqual(feedback.tone_score, 8)
@@ -96,13 +96,13 @@ class TestCoachingAndMultimodal(unittest.TestCase):
         state.sentiment = "NEGATIVE"
         state.intent = "Refund Request"
         state.retrieved_sources = [{
-            "document": "TechCare Refund Policy",
+            "document": "Nexora Technologies Refund Policy",
             "section": "Duplicate Deduction Procedure",
             "text": "Excess transaction is reversed within 48 hours."
         }]
 
         response = generate_suggested_response(state)
-        self.assertIn("TechCare Refund Policy", response)
+        self.assertIn("Nexora Technologies Refund Policy", response)
         self.assertIn("apologize", response.lower())
 
     def test_generate_suggested_response_telugu(self):
@@ -111,13 +111,13 @@ class TestCoachingAndMultimodal(unittest.TestCase):
         state.sentiment = "NEGATIVE"
         state.intent = "Technical Issue"
         state.retrieved_sources = [{
-            "document": "TechCare Router Troubleshooting",
+            "document": "Nexora Technologies Router Troubleshooting",
             "section": "Step-by-Step Fix for Red Light Issue",
             "text": "Power cycle router."
         }]
 
         response = generate_suggested_response(state)
-        self.assertIn("TechCare Router Troubleshooting", response)
+        self.assertIn("Nexora Technologies Router Troubleshooting", response)
         self.assertIn("నమస్కారం", response)
 
 

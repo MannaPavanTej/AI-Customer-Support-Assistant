@@ -5,7 +5,7 @@ Uses faiss.IndexFlatIP for exact cosine similarity search on normalized vectors.
 
 from pathlib import Path
 from typing import List, Tuple, Optional
-import pickle
+import json
 import faiss
 import numpy as np
 import config
@@ -21,7 +21,7 @@ class FAISSVectorStore:
     def __init__(self, index_dir: Path = config.VECTOR_STORE_DIR):
         self.index_dir = index_dir
         self.index_path = index_dir / "index.faiss"
-        self.metadata_path = index_dir / "metadata.pkl"
+        self.metadata_path = index_dir / "metadata.json"
         self.index: Optional[faiss.IndexFlatIP] = None
         self.chunks: List[Chunk] = []
 
@@ -58,8 +58,13 @@ class FAISSVectorStore:
         self.index_dir.mkdir(parents=True, exist_ok=True)
         if self.index is not None:
             faiss.write_index(self.index, str(self.index_path))
-        with open(self.metadata_path, "wb") as f:
-            pickle.dump(self.chunks, f)
+        payload = {
+            "schema_version": 1,
+            "dimension": self.index.d if self.index is not None else None,
+            "chunks": [chunk.to_dict() for chunk in self.chunks],
+        }
+        with open(self.metadata_path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False)
 
     def load(self) -> bool:
         """
@@ -71,8 +76,13 @@ class FAISSVectorStore:
         if self.index_path.exists() and self.metadata_path.exists():
             try:
                 self.index = faiss.read_index(str(self.index_path))
-                with open(self.metadata_path, "rb") as f:
-                    self.chunks = pickle.load(f)
+                with open(self.metadata_path, "r", encoding="utf-8") as f:
+                    payload = json.load(f)
+                if payload.get("schema_version") != 1 or payload.get("dimension") != self.index.d:
+                    return False
+                self.chunks = [Chunk(**chunk) for chunk in payload.get("chunks", [])]
+                if self.index.ntotal != len(self.chunks):
+                    return False
                 return True
             except Exception as e:
                 print(f"Error loading FAISS index: {e}")

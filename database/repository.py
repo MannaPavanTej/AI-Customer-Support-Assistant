@@ -10,16 +10,47 @@ import uuid
 from datetime import datetime
 from models.conversation import ConversationState
 from .database import get_connection, init_db
+from services.security_service import DataCipher, hash_password, verify_password
+from services.observability import get_logger
 
 
 class SupportRepository:
     """
-    Data access repository for TechCare conversation persistence.
+    Data access repository for Nexora Technologies conversation persistence.
     """
 
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path
         init_db(self.db_path)
+        self.cipher = DataCipher()
+        self.logger = get_logger()
+
+    def bootstrap_admin(self, username: str, password: str, role: str = "admin") -> None:
+        """Create the configured administrator once; password is stored hashed."""
+        if not username or not password:
+            return
+        conn = get_connection(self.db_path)
+        conn.execute("INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+                     (username, hash_password(password), role))
+        conn.commit()
+        conn.close()
+
+    def authenticate(self, username: str, password: str) -> Optional[Dict[str, str]]:
+        conn = get_connection(self.db_path)
+        row = conn.execute("SELECT username, password_hash, role FROM users WHERE username = ? AND active = 1", (username,)).fetchone()
+        conn.close()
+        if row and verify_password(password, row["password_hash"]):
+            self.log_audit(username, "login_success")
+            return {"username": row["username"], "role": row["role"]}
+        self.log_audit(username or "unknown", "login_failed")
+        return None
+
+    def log_audit(self, username: str, action: str, details: str = "") -> None:
+        conn = get_connection(self.db_path)
+        conn.execute("INSERT INTO audit_events (username, action, details) VALUES (?, ?, ?)", (username, action, details[:500]))
+        conn.commit()
+        conn.close()
+        self.logger.info("audit action=%s username=%s", action, username)
 
     def create_session(self, session_id: Optional[str] = None, language: str = "en") -> str:
         """
@@ -38,7 +69,7 @@ class SupportRepository:
 
         cursor.execute("""
         INSERT OR IGNORE INTO sessions (session_id, primary_language, status)
-        VALUES (?, ?, 'RESOLVED');
+        VALUES (?, ?, 'OPEN');
         """, (sid, language))
 
         conn.commit()
@@ -80,7 +111,7 @@ class SupportRepository:
         # Ensure session exists
         cursor.execute("""
         INSERT OR IGNORE INTO sessions (session_id, primary_language, status)
-        VALUES (?, ?, 'RESOLVED');
+        VALUES (?, ?, 'OPEN');
         """, (session_id, state.language))
 
         # Insert turn record
@@ -93,11 +124,11 @@ class SupportRepository:
             suggested_response, image_path
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """, (
-            session_id, customer_text, agent_message, state.language,
+            session_id, self.cipher.encrypt(customer_text), self.cipher.encrypt(agent_message), state.language,
             state.sentiment, state.sentiment_confidence, state.intent, state.intent_confidence,
-            state.urgency, state.escalation_risk, state.key_issue, sources_json,
+            state.urgency, state.escalation_risk, self.cipher.encrypt(state.key_issue), sources_json,
             coaching_tip, tone, empathy, clarity,
-            state.suggested_response, img
+            self.cipher.encrypt(state.suggested_response), self.cipher.encrypt(img)
         ))
 
         log_id = cursor.lastrowid
@@ -113,6 +144,7 @@ class SupportRepository:
 
         conn.commit()
         conn.close()
+        self.logger.info("turn_logged session_id=%s encrypted=%s", session_id, self.cipher.enabled)
         return log_id
 
     def get_all_sessions(self, limit: int = 50) -> List[Dict[str, Any]]:
@@ -165,6 +197,8 @@ class SupportRepository:
                 d["retrieved_sources"] = json.loads(d["retrieved_sources"]) if d["retrieved_sources"] else []
             except Exception:
                 d["retrieved_sources"] = []
+            for field in ("customer_message", "agent_message", "key_issue", "suggested_response", "image_path"):
+                d[field] = self.cipher.decrypt(d.get(field))
             results.append(d)
 
         return results
@@ -201,10 +235,10 @@ class SupportRepository:
         """
         logs = self.get_session_logs(session_id)
         if not logs:
-            return f"# TechCare Support Session: {session_id}\n\n*No conversation records found.*"
+            return f"# Nexora Technologies Support Session: {session_id}\n\n*No conversation records found.*"
 
         lines = [
-            f"# TechCare Support Audit Transcript",
+            f"# Nexora Technologies Support Audit Transcript",
             f"**Session ID:** `{session_id}`  ",
             f"**Total Turns:** {len(logs)}  ",
             f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n",

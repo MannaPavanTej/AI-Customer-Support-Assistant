@@ -1,7 +1,7 @@
-# TechCare Account & Security FAQ
+# Nexora Technologies Account & Security FAQ
 
-## How do I reset my TechCare account password?
-1. Open the TechCare mobile app or website login page.
+## How do I reset my Nexora Technologies account password?
+1. Open the Nexora Technologies mobile app or website login page.
 2. Click on 'Forgot Password'.
 3. Enter your registered email or phone number.
 4. Enter the 6-digit OTP received via SMS/Email and create a new secure password.

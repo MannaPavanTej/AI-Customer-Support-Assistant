@@ -45,7 +45,7 @@ class TestDatabasePersistence(unittest.TestCase):
         state.escalation_risk = "HIGH"
         state.key_issue = "Duplicate deduction on card checkout"
         state.retrieved_sources = [{
-            "document": "TechCare Refund Policy",
+            "document": "Nexora Technologies Refund Policy",
             "section": "Duplicate Deduction Procedure",
             "text": "Excess transaction is reversed in 48h"
         }]
@@ -86,7 +86,7 @@ class TestDatabasePersistence(unittest.TestCase):
         )
 
         md = self.repo.export_session_markdown(sid)
-        self.assertIn("TechCare Support Audit Transcript", md)
+        self.assertIn("Nexora Technologies Support Audit Transcript", md)
         self.assertIn(sid, md)
         self.assertIn("How do I reset my router?", md)
 

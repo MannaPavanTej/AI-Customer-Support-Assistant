@@ -31,7 +31,7 @@ class TestRAGPipeline(unittest.TestCase):
         self.assertTrue(hasattr(sample_chunk, "text"))
 
     def test_embeddings_generation(self):
-        sample_text = "TechCare refund policy applies to duplicate deductions."
+        sample_text = "Nexora Technologies refund policy applies to duplicate deductions."
         vec = compute_embeddings(sample_text)
         self.assertEqual(len(vec.shape), 2)
         self.assertEqual(vec.shape[1], 384, "Sentence-transformers MiniLM produces 384-dimensional embeddings")

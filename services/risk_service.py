@@ -104,7 +104,7 @@ def evaluate_conversation_risk(state: ConversationState) -> Tuple[str, str, str]
             key_issue = "Customer requesting transaction refund"
     elif state.intent == "Technical Issue":
         if "router" in text or "రౌటర్" in text or "राउटर" in text:
-            key_issue = "TechCare router connectivity / setup failure"
+            key_issue = "Nexora Technologies router connectivity / setup failure"
         elif "red light" in text or "ఎర్ర" in text or "लाल" in text:
             key_issue = "Device showing red indicator light"
         else:

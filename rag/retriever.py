@@ -41,7 +41,7 @@ INDIC_CROSS_LINGUAL_MAP = {
 
 class KnowledgeRetriever:
     """
-    Orchestrates the complete RAG retrieval pipeline for TechCare knowledge grounding.
+    Orchestrates the complete RAG retrieval pipeline for Nexora Technologies knowledge grounding.
     """
 
     def __init__(self, vector_store: Optional[FAISSVectorStore] = None):
@@ -51,7 +51,7 @@ class KnowledgeRetriever:
     def _initialize_index(self) -> None:
         """Loads existing index from disk or builds a fresh index from knowledge base docs."""
         if not self.vector_store.load():
-            print("Building fresh FAISS index from TechCare knowledge base...")
+            print("Building fresh FAISS index from Nexora Technologies knowledge base...")
             docs = load_documents()
             chunks = chunk_documents(docs)
             self.vector_store.build_from_chunks(chunks)
@@ -129,5 +129,5 @@ class KnowledgeRetriever:
                 "found": False,
                 "sources": [],
                 "context_text": "",
-                "fallback_message": "No relevant company information was found in the TechCare knowledge base. Please verify this information manually."
+                "fallback_message": "No relevant company information was found in the Nexora Technologies knowledge base. Please verify this information manually."
             }

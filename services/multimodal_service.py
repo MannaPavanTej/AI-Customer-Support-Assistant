@@ -93,7 +93,7 @@ def analyze_image(image_path: Optional[str], customer_text: str = "") -> Dict[st
             
             # Context-driven diagnostic inference
             if red_ratio > 0.03 or "red" in text_lower or "light" in text_lower or "router" in text_lower:
-                detected_element = "TechCare Hardware Diagnostic - LED Warning Indicator"
+                detected_element = "Nexora Technologies Hardware Diagnostic - LED Warning Indicator"
                 visual_summary = (
                     f"Uploaded image ({width}x{height} {img_format}) shows hardware device with active "
                     f"optical indicator lights. High-intensity indicator detected consistent with WAN connectivity loss."

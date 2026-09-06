@@ -146,7 +146,7 @@ def evaluate_agent_draft(agent_text: str, customer_state: Optional[ConversationS
     if "soon" in text_lower or "later" in text_lower:
         tips.append("Replace vague words like 'soon' with specific business timelines (e.g., 'within 24-48 business hours').")
     if any(p in text_lower for p in DEFENSIVE_PHRASES):
-        tips.append("Avoid defensive phrasing; focus on what TechCare can actively do to resolve the problem.")
+        tips.append("Avoid defensive phrasing; focus on what Nexora Technologies can actively do to resolve the problem.")
     if not any(p in text_lower for p in POLITE_PHRASES):
         tips.append("Add a polite greeting or closing statement (e.g., 'Thank you for reaching out').")
 
