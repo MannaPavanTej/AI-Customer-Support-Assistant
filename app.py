@@ -1,4 +1,4 @@
-"""AgentGuide AI — Nexora Technologies support-agent workspace."""
+"""Development of AI-Powered Customer Support Assistant with Live Response Guidance."""
 
 import streamlit as st
 from pathlib import Path

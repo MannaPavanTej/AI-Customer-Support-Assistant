@@ -1,7 +1,7 @@
-# AgentGuide AI by Nexora Technologies — System Architecture
+# Development of AI-Powered Customer Support Assistant with Live Response Guidance
 
 ## 1. Executive Summary
-**AgentGuide AI** is an intelligent co-pilot by **Nexora Technologies**, designed to assist human customer-support agents.
+This project is an intelligent co-pilot by **Nexora Technologies**, designed to assist human customer-support agents.
 
 The system operates on a **Human-in-the-Loop** model: rather than replacing human agents with an autonomous chatbot, the AI analyzes incoming customer messages in real-time, retrieves grounded company policies via Retrieval-Augmented Generation (RAG), scores agent drafts on quality (Tone, Empathy, Clarity), and provides grounded suggested responses.
 

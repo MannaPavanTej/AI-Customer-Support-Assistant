@@ -24,7 +24,7 @@ TEMP_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # Application Info
-APP_TITLE = "AgentGuide AI"
+APP_TITLE = "Development of AI-Powered Customer Support Assistant with Live Response Guidance"
 APP_SUBTITLE = "Human-guided intelligence for exceptional customer support"
 COMPANY_NAME = "Nexora Technologies"
 

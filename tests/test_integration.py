@@ -1,5 +1,5 @@
 """
-End-to-End Integration Tests for Nexora Technologies AI Customer Support Assistant.
+End-to-End Integration Tests for Development of AI-Powered Customer Support Assistant with Live Response Guidance.
 Tests complete multi-turn conversational workflows across English, Telugu, Hindi, RAG retrieval, Multimodal diagnostics, Coaching, and Persistence.
 """
 

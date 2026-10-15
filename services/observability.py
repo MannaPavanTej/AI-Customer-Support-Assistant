@@ -5,7 +5,7 @@ from logging.handlers import RotatingFileHandler
 import config
 
 
-def get_logger(name: str = "agentguide") -> logging.Logger:
+def get_logger(name: str = "customer_support_assistant") -> logging.Logger:
     logger = logging.getLogger(name)
     if not logger.handlers:
         handler = RotatingFileHandler(config.LOG_DIR / "application.log", maxBytes=1_000_000, backupCount=3, encoding="utf-8")

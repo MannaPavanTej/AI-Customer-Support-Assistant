@@ -1,177 +1,134 @@
-# AgentGuide AI — Customer Support Intelligence Platform
+# Development of AI-Powered Customer Support Assistant with Live Response Guidance
 
-**AgentGuide AI** is an intelligent, human-in-the-loop co-pilot by **Nexora Technologies**, designed to assist support agents during live customer conversations.
+![Python 3.11](https://img.shields.io/badge/python-3.11-blue)
+![Streamlit](https://img.shields.io/badge/UI-Streamlit-ff4b4b)
+[![Tests](https://github.com/MannaPavanTej/AI-Customer-Support-Assistant/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/MannaPavanTej/AI-Customer-Support-Assistant/actions/workflows/tests.yml)
 
----
+**A human-guided customer support workspace by Nexora Technologies.** The AI assistant analyzes support messages, surfaces relevant company guidance, and drafts coaching and response suggestions. A support agent reviews and approves every reply.
 
-## 🌟 Key Features
+## What it does
 
-1. **Human-in-the-Loop Co-Pilot**:
-   - The AI acts as an advisor, generating live analytics, grounded knowledge citations, live coaching, and suggested drafts.
-   - The human support agent reviews, edits, and approves every outgoing response.
-2. **Three-Language Multilingual Support**:
-   - Seamless support for **English**, **Hindi (हिंदी)**, and **Telugu (తెలుగు)** with hybrid Unicode script detection and statistical N-gram fallback.
-3. **Real-Time Conversation Understanding**:
-   - **Sentiment Analysis**: Emotional polarity (`POSITIVE`, `NEUTRAL`, `NEGATIVE`) with confidence scoring.
-   - **Zero-Shot Intent Classification**: Categorizes across 8 core support areas (`Refund Request`, `Technical Issue`, `Cancellation`, `Complaint`, `Purchase & Pricing`, `Order & Delivery Query`, `General Query`, `Feedback`).
-   - **Risk Evaluation**: Urgency (`LOW`, `MEDIUM`, `HIGH`), Escalation Risk (`LOW`, `MEDIUM`, `HIGH`), and Key Issue summarization.
-4. **Multimodal Visual Diagnostics**:
-   - Upload and inspect hardware photos (router warning LED indicators) and checkout error screenshots with strict integrity validation.
-5. **Grounded FAISS RAG Retrieval**:
-   - Fast retrieval over 12 Nexora Technologies policies, FAQs, and manuals, with Telugu and Hindi query expansion.
-   - **Grounded-response guardrail**: Requires at least 0.35 query-term coverage and returns a manual-verification fallback for out-of-scope queries.
-6. **Two-Way Live AI Coaching**:
-   - *Customer-Context Guidance*: Upfront coaching on empathy and de-escalation based on customer state.
-   - *Agent-Draft Live Critique*: Real-time scoring of Tone ($1\text{-}10$), Empathy ($1\text{-}10$), and Clarity ($1\text{-}10$) as the agent types into the composer.
-7. **Persistent SQLite Audit Database**:
-   - Automatically logs complete conversation turns, analysis metrics, quality scores, and retrieved sources.
-   - Sidebar history explorer with turn review and Markdown transcript export.
+- **Understands customer messages:** estimates language, sentiment, intent, urgency, and escalation risk.
+- **Supports three languages:** English, Hindi (हिंदी), and Telugu (తెలుగు), with script-aware detection and language-specific response templates.
+- **Finds company guidance:** searches the included policies, FAQs, and manuals using deterministic term matching and Telugu/Hindi query expansion. Low-relevance queries receive an explicit no-answer fallback.
+- **Reviews images:** validates uploaded images and provides lightweight visual diagnostics for device photos and checkout screenshots.
+- **Coaches support agents:** gives customer-context coaching and scores draft replies for tone, empathy, and clarity.
+- **Keeps a conversation history:** stores sessions and turn details in SQLite and can export transcripts as Markdown.
 
----
+> This project is an assistive prototype. It prepares suggestions; a human agent remains responsible for reviewing, editing, and sending customer replies.
 
-## 🏗️ System Architecture Flow
+## See the workflow
 
-```
-Customer Message (Text/Image in EN/HI/TE)
-               │
-               ▼
-     Streamlit Agent UI
-               │
-    ┌──────────┼──────────┐
-    ▼          ▼          ▼
- Language  Sentiment    Intent
-Detection  Analysis  Classification
-    └──────────┬──────────┘
-               │
-     Urgency & Risk Evaluation
-               │
-     Multimodal Image Analysis (Optional)
-               │
-     FAISS RAG Knowledge Retrieval
-               │
-     AI Coaching & Suggested Response
-               │
-     Human Support Agent Review / Edit
-               │
-     Approved Response & SQLite History
+```mermaid
+flowchart TD
+    A[Customer message and optional image] --> B[Streamlit support workspace]
+    B --> C[Language, sentiment, and intent analysis]
+    B --> D[Urgency and escalation assessment]
+    B --> E[Knowledge-base retrieval]
+    B --> F[Optional image diagnostics]
+    C --> G[Coaching and response draft]
+    D --> G
+    E --> G
+    F --> G
+    G --> H[Agent reviews and edits]
+    H --> I[Approved response and SQLite history]
 ```
 
----
+## Quickstart
 
-## 📁 Project Directory Structure
+### Requirements
 
-```
-AI_Customer_Coaching/
-├── app.py                     # Streamlit Agent Workspace & Dashboard Entry Point
-├── config.py                  # Central configuration constants, paths, and thresholds
-├── requirements.txt           # Project dependencies
-├── .env.example               # Environment variables template
-├── .gitignore                 # Git ignore rules
-├── README.md                  # Project overview and setup instructions
-│
-├── models/
-│   ├── __init__.py
-│   └── conversation.py        # Message, ConversationState, CoachingFeedback dataclasses
-│
-├── services/
-│   ├── __init__.py
-│   ├── language_service.py    # English / Hindi / Telugu script & N-gram LID
-│   ├── sentiment_service.py   # Multilingual sentiment analysis & confidence scoring
-│   ├── intent_service.py      # Zero-shot intent classification
-│   ├── risk_service.py        # Urgency, Escalation Risk, and Key Issue analyzer
-│   ├── multimodal_service.py  # Image validation and hardware/UI diagnostics
-│   ├── coaching_service.py    # Two-way coaching & real-time draft critique
-│   └── response_service.py    # Multilingual grounded draft reply generator
-│
-├── rag/
-│   ├── __init__.py
-│   ├── document_loader.py     # Ingests markdown files with title/category extraction
-│   ├── chunker.py             # Semantic section-based chunking with metadata
-│   ├── embeddings.py          # SentenceTransformers (all-MiniLM-L6-v2) 384-d embeddings
-│   ├── vector_store.py        # FAISS IndexFlatIP (Cosine Similarity) persistence
-│   └── retriever.py           # Deterministic retrieval with zero-hallucination guardrail
-│
-├── database/
-│   ├── __init__.py
-│   ├── database.py            # SQLite schema (sessions & conversation_logs tables)
-│   └── repository.py          # CRUD data access and Markdown export
-│
-├── knowledge_base/
-│   ├── policies/              # Refund, return, cancellation, replacement, warranty
-│   ├── faq/                   # Payment, delivery, account, product FAQs
-│   └── manuals/               # Router troubleshooting, device setup, connectivity
-│
-├── vector_store/              # Serialized FAISS index (index.faiss & metadata.pkl)
-│
-├── tests/
-│   ├── test_models.py         # Unit tests for domain models
-│   ├── test_analysis.py       # Unit tests for Language, Sentiment, Intent, Risk
-│   ├── test_rag.py            # Unit tests for RAG pipeline & no-answer fallback
-│   ├── test_coaching.py       # Unit tests for Multimodal, Coaching, Response generator
-│   ├── test_database.py       # Unit tests for SQLite persistence & session logs
-│   └── test_integration.py    # End-to-End multi-turn workflow integration tests
-│
-└── docs/
-    ├── architecture.md        # Comprehensive system architecture document
-    └── viva_preparation.md    # Viva defense Q&A cheat sheet & talking points
+- Python 3.11
+- Windows, macOS, or Linux
+
+### 1. Get the project and create an environment
+
+From the project directory, create and activate a virtual environment.
+
+**Windows PowerShell**
+
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
----
+**macOS / Linux**
 
-## 🚀 Quickstart Guide
-
-### 1. Set Up Environment
 ```bash
-python -m venv venv
-.\venv\Scripts\activate   # Windows
-# source venv/bin/activate # Linux / macOS
+python3.11 -m venv .venv
+source .venv/bin/activate
 ```
 
-### 2. Install Dependencies
+### 2. Install dependencies
+
 ```bash
-pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
-### 3. Run Automated Tests
-```bash
-python -m unittest discover -s tests -v
-```
-The suite contains 38 unit and integration tests. It runs fully offline: when the optional MiniLM model has not been cached locally, RAG uses a deterministic token-hash fallback. For stronger semantic retrieval in deployment, cache `all-MiniLM-L6-v2` during image/build setup.
+Some machine-learning dependencies are large, so the first installation may take a few minutes.
 
-### 4. Launch the Streamlit Dashboard
+### 3. Start the app
+
 ```bash
 streamlit run app.py
 ```
-Open your browser at `http://localhost:8501`.
 
----
+Open [http://localhost:8501](http://localhost:8501) in your browser. Stop the local server with `Ctrl+C` in the terminal.
 
-## 🧪 Sample Demonstration Scenarios
+## Run the test suite
 
-1. **English Payment Issue & Escalation**:
-   - Customer Message: `"This is the third time contacting you! My card was deducted twice for one router order and I want an immediate refund!"`
-   - AI Guidance: Negative sentiment | Refund Request | HIGH Urgency | HIGH Escalation Risk | Retrieves Nexora Technologies Refund Policy | Pre-populates grounded apology with 24-48h refund timeline.
-2. **Telugu Technical Issue with Router Photo**:
-   - Customer Message: `"నా రౌటర్ లో ఎర్ర లైట్ వెలుగుతోంది, ఇంటర్నెట్ రావడం లేదు."` + Attach router photo.
-   - AI Guidance: Telugu language | Technical Issue | Multimodal Red LED warning detected | Retrieves Router Troubleshooting Manual | Generates polite grounded reply in Telugu.
-3. **Hindi Delivery Inquiry**:
-   - Customer Message: `"नमस्ते, मुझे मेरे ऑर्डर की डिलीवरी स्थिति जाननी है।"`
-   - AI Guidance: Hindi language | Order & Delivery Query | Retrieves Delivery FAQ.
-4. **Out-of-Scope Guardrail Query**:
-   - Customer Message: `"What is the recipe for baking chocolate cookies?"`
-   - AI Guidance: Explicit warning: `⚠️ No relevant company information was found in the knowledge base. Please verify this information manually.`
+```bash
+python -m unittest discover -s tests -v
+```
 
----
+GitHub Actions runs the same command on pushes and pull requests. The workflow is defined in [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
 
-## 🎓 Academic Defense & Viva Resources
-Detailed technical explanations, algorithm rationale, and model selection defenses are available in:
-- [docs/architecture.md](file:///c:/Users/PAVAN%20TEJ/OneDrive/Desktop/AI_Customer_Coaching/docs/architecture.md)
-- [docs/viva_preparation.md](file:///c:/Users/PAVAN%20TEJ/OneDrive/Desktop/AI_Customer_Coaching/docs/viva_preparation.md)
+## Try these example messages
 
----
+| Scenario | Example | Expected guidance |
+| --- | --- | --- |
+| Duplicate payment | “My card was deducted twice for one order and I want a refund.” | Refund guidance, risk assessment, and a response draft |
+| Router issue in Telugu | “నా రౌటర్ లో ఎర్ర లైట్ వెలుగుతోంది, ఇంటర్నెట్ రావడం లేదు.” | Telugu analysis and router troubleshooting guidance |
+| Delivery question in Hindi | “नमस्ते, मुझे मेरे ऑर्डर की डिलीवरी स्थिति जाननी है।” | Hindi analysis and delivery FAQ guidance |
+| Unrelated question | “What is the recipe for chocolate brownies?” | A no-relevant-information fallback |
 
-## Production Readiness Notes
+## How retrieval works
 
-This repository is a human-in-the-loop support prototype. Do not use it with real customer data until authentication, role-based access, encrypted storage, retention/deletion policies, and centralized monitoring are in place. Uploaded images are stored temporarily and automatically removed after 24 hours. The visual diagnostic feature is a lightweight image heuristic, not a certified device or screenshot recognition model.
+The default retriever splits the local Markdown knowledge base into sections, expands supported Hindi and Telugu terms into English equivalents, and ranks passages by query-term coverage. It returns sources only when the best passage meets the configured `0.35` relevance threshold. Questions with insufficient overlap receive a manual-verification fallback instead of company-specific guidance.
 
-The local foundation for those controls is included: set `APP_ENV=production`, `AUTH_ENABLED=true`, administrator credentials, and a Fernet `DATA_ENCRYPTION_KEY` in `.env`. Production startup deliberately stops if any of these settings are missing.
+The repository also contains embedding and FAISS utilities, but the current `KnowledgeRetriever` path uses deterministic term matching. This keeps the default retrieval behavior predictable in local development and CI without requiring a downloaded embedding model.
+
+## Project layout
+
+```text
+.
+├── app.py                  # Streamlit support workspace
+├── config.py               # App settings, paths, and limits
+├── requirements.txt        # Python dependencies
+├── services/               # Language, sentiment, risk, coaching, and response logic
+├── rag/                    # Knowledge loading, chunking, retrieval, and vector utilities
+├── knowledge_base/         # Policies, FAQs, and product manuals
+├── models/                 # Conversation and feedback data models
+├── database/               # SQLite persistence and transcript export
+├── tests/                  # Unit and integration tests
+└── docs/                   # Architecture notes and project Q&A
+```
+
+## Configuration and data
+
+The app runs locally with development defaults and does not require API credentials. Optional environment settings are documented in [`.env.example`](.env.example). Copy it to `.env` only when you need to configure authentication or production safeguards; keep populated secrets out of Git.
+
+Conversation history is stored in the local SQLite database. Uploaded images are kept temporarily and the app is configured to remove them after 24 hours. Review the retention and access controls before using real customer information.
+
+## Scope and limitations
+
+- Sentiment and intent are lightweight, rule-based analyses; their scores are guidance, not calibrated probabilities.
+- Image diagnostics use basic image properties and heuristics. They are not a general-purpose vision model or a certified hardware diagnosis.
+- Retrieval is limited to the knowledge-base content included in this repository. Keep policies and FAQs current, and verify advice before sending it to a customer.
+- This repository is a prototype, not a production-ready customer data system. Before production use, configure authentication, access controls, encryption keys, data retention, monitoring, and operational review.
+
+## Project documentation
+
+- [Architecture](docs/architecture.md)
+- [Viva preparation and design Q&A](docs/viva_preparation.md)

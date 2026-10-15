@@ -1,7 +1,7 @@
 # Viva & Technical Defense Preparation Guide
 
 ## 🎯 1. 30-Second Project Elevator Pitch
-> *"AgentGuide AI by Nexora Technologies is an AI-powered customer-support assistant designed to provide live response guidance to human support agents. The system detects the customer's language across English, Hindi, and Telugu, analyzes sentiment and zero-shot intent, and evaluates urgency and escalation risk. It optionally understands customer-uploaded hardware photos and screenshots using multimodal diagnostics. It then uses RAG with a FAISS vector database to retrieve grounded Nexora Technologies knowledge. The retrieved knowledge and conversation context are used to provide live coaching feedback on Tone, Empathy, and Clarity, as well as a pre-generated draft reply. The human agent retains complete control to review, edit, and approve the response, while SQLite maintains full persistent audit logs."*
+> *"Development of AI-Powered Customer Support Assistant with Live Response Guidance is a human-guided support tool by Nexora Technologies. It detects the customer's language across English, Hindi, and Telugu, analyzes sentiment and intent, and evaluates urgency and escalation risk. It can inspect customer-uploaded hardware photos and screenshots using lightweight image diagnostics. It retrieves relevant information from the Nexora Technologies knowledge base, then uses the conversation context to provide coaching feedback on tone, empathy, and clarity, along with a draft reply. The human agent reviews, edits, and approves the response. SQLite stores conversation history."*
 
 ---
 
