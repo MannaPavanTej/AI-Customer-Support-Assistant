@@ -19,19 +19,29 @@
 
 ## See the workflow
 
-```mermaid
-flowchart TD
-    A[Customer message and optional image] --> B[Streamlit support workspace]
-    B --> C[Language, sentiment, and intent analysis]
-    B --> D[Urgency and escalation assessment]
-    B --> E[Knowledge-base retrieval]
-    B --> F[Optional image diagnostics]
-    C --> G[Coaching and response draft]
-    D --> G
-    E --> G
-    F --> G
-    G --> H[Agent reviews and edits]
-    H --> I[Approved response and SQLite history]
+```
+Customer message + optional image
+                 |
+                 v
+       Streamlit support workspace
+                 |
+   +-------------+-------------+----------------+
+   |             |             |                |
+   v             v             v                v
+Language,     Urgency and   Knowledge-base   Optional image
+sentiment,    escalation    retrieval        diagnostics
+and intent    assessment
+   |             |             |                |
+   +-------------+-------------+----------------+
+                 |
+                 v
+       Coaching + response draft
+                 |
+                 v
+       Agent reviews and edits
+                 |
+                 v
+     Approved reply + SQLite history
 ```
 
 ## Quickstart
