@@ -18,8 +18,8 @@
 4. **Multimodal Visual Diagnostics**:
    - Upload and inspect hardware photos (router warning LED indicators) and checkout error screenshots with strict integrity validation.
 5. **Grounded FAISS RAG Retrieval**:
-   - Fast vector similarity search over 12 Nexora Technologies policies, FAQs, and manuals.
-   - **Grounded-response guardrail**: Enforces cosine-similarity thresholding and a clear manual-verification fallback for out-of-scope queries.
+   - Fast retrieval over 12 Nexora Technologies policies, FAQs, and manuals, with Telugu and Hindi query expansion.
+   - **Grounded-response guardrail**: Requires at least 0.35 query-term coverage and returns a manual-verification fallback for out-of-scope queries.
 6. **Two-Way Live AI Coaching**:
    - *Customer-Context Guidance*: Upfront coaching on empathy and de-escalation based on customer state.
    - *Agent-Draft Live Critique*: Real-time scoring of Tone ($1\text{-}10$), Empathy ($1\text{-}10$), and Clarity ($1\text{-}10$) as the agent types into the composer.
@@ -89,7 +89,7 @@ AI_Customer_Coaching/
 │   ├── chunker.py             # Semantic section-based chunking with metadata
 │   ├── embeddings.py          # SentenceTransformers (all-MiniLM-L6-v2) 384-d embeddings
 │   ├── vector_store.py        # FAISS IndexFlatIP (Cosine Similarity) persistence
-│   └── retriever.py           # Similarity search with zero-hallucination guardrail
+│   └── retriever.py           # Deterministic retrieval with zero-hallucination guardrail
 │
 ├── database/
 │   ├── __init__.py

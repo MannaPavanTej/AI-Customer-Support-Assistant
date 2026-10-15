@@ -94,7 +94,7 @@ The system operates on a **Human-in-the-Loop** model: rather than replacing huma
 - `chunker.py`: Splits documents by section headers (`##`), preserving document title and section metadata.
 - `embeddings.py`: Uses `SentenceTransformers` (`all-MiniLM-L6-v2`) generating 384-dimensional unit-normalized embeddings.
 - `vector_store.py`: Local vector index using `faiss.IndexFlatIP` (Exact Inner Product = Cosine Similarity).
-- `retriever.py`: Executes similarity search with a strict relevance threshold ($\ge 0.35$) and cross-lingual keyword mapping, guaranteeing zero-hallucination fallback.
+- `retriever.py`: Uses deterministic query-term coverage (threshold $\ge 0.35$) with cross-lingual keyword mapping and an explicit out-of-scope fallback.
 
 ### 3.4 Persistence & History (`database/`)
 - `database.py`: Initializes SQLite schema (`sessions` and `conversation_logs` tables).
