@@ -24,7 +24,7 @@ from database import SupportRepository
 # ==========================================
 st.set_page_config(
     page_title=config.APP_TITLE,
-    page_icon="✨",
+    page_icon="N",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -36,71 +36,66 @@ if "ui_theme" not in st.session_state:
 
 theme = {
     "Light": {
-        "bg": "#f6f8fc", "surface": "#ffffff", "surface_alt": "#f8fafc",
-        "text": "#14213d", "muted": "#64748b", "border": "#dce3ef",
-        "accent": "#52657f", "accent_hover": "#41546d", "sidebar": "#10172a",
-        "sidebar_text": "#e7edff", "shadow": "rgba(15, 23, 42, .08)",
-        "glow": "rgba(99, 102, 241, .16)", "input": "#ffffff",
-        "sidebar_control_bg": "#f8fafc", "sidebar_control_text": "#0f172a",
+        "bg": "#f3f5f7", "surface": "#ffffff", "surface_alt": "#f7f8fa",
+        "text": "#202a35", "muted": "#667482", "border": "#d8dee5",
+        "accent": "#365f85", "accent_hover": "#294c6d", "sidebar": "#243442",
+        "sidebar_text": "#edf1f4", "shadow": "rgba(25, 42, 58, .05)",
+        "glow": "rgba(0, 0, 0, 0)", "input": "#ffffff",
+        "sidebar_control_bg": "#ffffff", "sidebar_control_text": "#263746",
     },
     "Dark": {
-        "bg": "#0b1120", "surface": "#111a2c", "surface_alt": "#172238",
-        "text": "#e8eefc", "muted": "#a7b4cb", "border": "#293753",
-        "accent": "#7180a8", "accent_hover": "#8998c2", "sidebar": "#090e1b",
-        "sidebar_text": "#e7edff", "shadow": "rgba(0, 0, 0, .28)",
-        "glow": "rgba(129, 140, 248, .17)", "input": "#0d1728",
-        "sidebar_control_bg": "#1e293b", "sidebar_control_text": "#f8fafc",
+        "bg": "#171d23", "surface": "#202830", "surface_alt": "#252f38",
+        "text": "#e8edf1", "muted": "#aab5bf", "border": "#3a4651",
+        "accent": "#6d91b2", "accent_hover": "#81a3c2", "sidebar": "#111920",
+        "sidebar_text": "#e6ebef", "shadow": "rgba(0, 0, 0, .16)",
+        "glow": "rgba(0, 0, 0, 0)", "input": "#1b242c",
+        "sidebar_control_bg": "#27333d", "sidebar_control_text": "#eef2f5",
     },
 }[st.session_state.ui_theme]
 
 ui_css = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-:root { --bg: __BG__; --surface: __SURFACE__; --surface-alt: __SURFACE_ALT__; --text: __TEXT__; --muted: __MUTED__; --border: __BORDER__; --accent: __ACCENT__; --accent-hover: __ACCENT_HOVER__; --sidebar: __SIDEBAR__; --sidebar-text: __SIDEBAR_TEXT__; --sidebar-control-bg: __SIDEBAR_CONTROL_BG__; --sidebar-control-text: __SIDEBAR_CONTROL_TEXT__; --shadow: __SHADOW__; --glow: __GLOW__; --input: __INPUT__; }
-html, body, [class*="css"] { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-.stApp { background: radial-gradient(circle at 8% -10%, var(--glow), transparent 31%), radial-gradient(circle at 96% 4%, var(--glow), transparent 25%), var(--bg); color: var(--text); }
-[data-testid="stHeader"] { background: transparent; }
-[data-testid="stSidebar"] { background: linear-gradient(180deg, var(--sidebar) 0%, #172554 145%); border-right: 1px solid rgba(255,255,255,.08); }
-[data-testid="stSidebar"] * { color: var(--sidebar-text); }
+:root { --bg: __BG__; --surface: __SURFACE__; --surface-alt: __SURFACE_ALT__; --text: __TEXT__; --muted: __MUTED__; --border: __BORDER__; --accent: __ACCENT__; --accent-hover: __ACCENT_HOVER__; --sidebar: __SIDEBAR__; --sidebar-text: __SIDEBAR_TEXT__; --sidebar-control-bg: __SIDEBAR_CONTROL_BG__; --sidebar-control-text: __SIDEBAR_CONTROL_TEXT__; --shadow: __SHADOW__; --input: __INPUT__; }
+html, body, [class*="css"] { font-family: "Segoe UI", Arial, sans-serif; }
+.stApp { background:var(--bg); color:var(--text); }
+[data-testid="stHeader"] { background:transparent; }
+[data-testid="stSidebar"] { background:var(--sidebar); border-right:1px solid rgba(255,255,255,.12); }
+[data-testid="stSidebar"] * { color:var(--sidebar-text); }
 [data-testid="stSidebar"] [data-testid="stCode"], [data-testid="stSidebar"] [data-testid="stCode"] pre, [data-testid="stSidebar"] code { background:var(--sidebar-control-bg) !important; color:var(--sidebar-control-text) !important; }
 [data-testid="stSidebar"] [data-testid="stCode"] *, [data-testid="stSidebar"] pre *, [data-testid="stSidebar"] code * { color:var(--sidebar-control-text) !important; -webkit-text-fill-color:var(--sidebar-control-text) !important; }
 [data-testid="stSidebar"] [data-baseweb="select"] > div, [data-testid="stSidebar"] [data-baseweb="select"] > div > div { background:var(--sidebar-control-bg) !important; border-color:rgba(255,255,255,.22) !important; }
-[data-testid="stSidebar"] [data-baseweb="select"] input { background:transparent !important; color:var(--sidebar-control-text) !important; -webkit-text-fill-color:var(--sidebar-control-text) !important; }
-[data-testid="stSidebar"] [data-baseweb="select"] span { color:var(--sidebar-control-text) !important; -webkit-text-fill-color:var(--sidebar-control-text) !important; }
-[data-testid="stSidebar"] [role="combobox"], [data-testid="stSidebar"] [role="combobox"] *, [data-testid="stSidebar"] input[role="combobox"] { color:var(--sidebar-control-text) !important; -webkit-text-fill-color:var(--sidebar-control-text) !important; }
+[data-testid="stSidebar"] [data-baseweb="select"] input, [data-testid="stSidebar"] [data-baseweb="select"] span, [data-testid="stSidebar"] [role="combobox"], [data-testid="stSidebar"] [role="combobox"] *, [data-testid="stSidebar"] input[role="combobox"] { color:var(--sidebar-control-text) !important; -webkit-text-fill-color:var(--sidebar-control-text) !important; }
 [data-testid="stSidebar"] [data-testid="stExpander"] { background:var(--sidebar-control-bg); border-color:rgba(255,255,255,.18); }
-[data-testid="stSidebar"] [data-testid="stExpander"] summary, [data-testid="stSidebar"] [data-testid="stExpander"] summary * { color:var(--sidebar-control-text) !important; }
-[data-testid="stSidebar"] [data-testid="stExpander"] [data-testid="stMarkdownContainer"], [data-testid="stSidebar"] [data-testid="stExpander"] [data-testid="stMarkdownContainer"] *, [data-testid="stSidebar"] [data-testid="stExpander"] p, [data-testid="stSidebar"] [data-testid="stExpander"] small { color:var(--sidebar-control-text) !important; }
+[data-testid="stSidebar"] [data-testid="stExpander"] summary, [data-testid="stSidebar"] [data-testid="stExpander"] summary *, [data-testid="stSidebar"] [data-testid="stExpander"] p { color:var(--sidebar-control-text) !important; }
 [data-testid="stSidebar"] div.stDownloadButton > button, [data-testid="stSidebar"] div.stDownloadButton > button * { background:var(--sidebar-control-bg) !important; color:var(--sidebar-control-text) !important; border-color:rgba(255,255,255,.22) !important; -webkit-text-fill-color:var(--sidebar-control-text) !important; }
-[data-testid="stSidebar"] div.stButton > button { background:rgba(255,255,255,.10) !important; color:#fff !important; border-color:rgba(191,219,254,.28) !important; }
-[data-testid="stSidebar"] div.stButton > button:hover { background:rgba(255,255,255,.17) !important; }
-[data-testid="stSidebar"] .stMetric { background: rgba(255,255,255,.07); border: 1px solid rgba(191,219,254,.16); border-radius: 12px; padding: 10px; }
-[data-testid="stSidebar"] [data-testid="stMetricLabel"] p { color: #b6c7ed !important; font-size: .67rem; text-transform: uppercase; letter-spacing: .05em; }
-[data-testid="stSidebar"] [data-testid="stMetricValue"] { color: #fff !important; font-size: 1rem; }
-.block-container { padding-top: 2rem; padding-bottom: 2.5rem; max-width: 1460px; }
-.app-header { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:22px 24px; background:linear-gradient(120deg,#312e81 0%,#2563eb 55%,#0891b2 100%); color:#fff; border-radius:18px; margin-bottom:22px; box-shadow:0 18px 38px -18px rgba(37,99,235,.72); }
-.app-header-title { font-size:1.5rem; font-weight:700; letter-spacing:-.035em; display:flex; align-items:center; gap:11px; }
-.app-header-subtitle { font-size:.84rem; color:#dbeafe; margin-top:4px; }
-.brand-mark { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:11px; background:rgba(255,255,255,.17); font-size:1.1rem; }
-.status-pill { display:inline-flex; align-items:center; gap:7px; padding:6px 11px; background:rgba(16,185,129,.15); color:#d1fae5; border:1px solid rgba(167,243,208,.3); border-radius:999px; font-size:.74rem; font-weight:600; }
-.status-dot { width:7px; height:7px; background:#6ee7b7; border-radius:50%; box-shadow:0 0 0 4px rgba(110,231,183,.12); }
-.pro-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:17px; margin-bottom:16px; box-shadow:0 10px 28px -18px var(--shadow); }
-.pro-card-header { font-size:.71rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--muted); margin-bottom:13px; display:flex; align-items:center; justify-content:space-between; }
-.metrics-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-bottom:12px; }
-.metric-box { background:var(--surface-alt); border:1px solid var(--border); border-radius:11px; padding:10px 11px; min-width:0; }
-.metric-box-label, .score-tile-title { font-size:.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; }
-.metric-box-value { font-size:.93rem; font-weight:700; color:var(--text); margin-top:4px; overflow-wrap:anywhere; }
-.badge-pill { display:inline-block; padding:3px 8px; border-radius:999px; font-size:.68rem; font-weight:700; line-height:1.2; }
-.badge-green { background:#dcfce7; color:#166534; }.badge-amber { background:#fef3c7; color:#92400e; }.badge-red { background:#fee2e2; color:#b91c1c; }.badge-blue { background:#dbeafe; color:#1d4ed8; }.badge-slate { background:#e2e8f0; color:#334155; }
-.coaching-banner { background:color-mix(in srgb, #22c55e 12%, var(--surface)); border-left:4px solid #22c55e; border-radius:9px; padding:12px 13px; margin-top:10px; font-size:.84rem; color:var(--text); line-height:1.48; }.coaching-banner-warning { background:color-mix(in srgb, #f59e0b 13%, var(--surface)); border-left-color:#f59e0b; }
-.score-container { display:flex; gap:9px; margin-bottom:8px; flex-wrap:wrap; }.score-tile { flex:1; min-width:96px; background:var(--surface-alt); border:1px solid var(--border); border-radius:11px; padding:9px; text-align:center; }.score-tile-num { font-size:1.05rem; font-weight:700; color:var(--text); margin-top:4px; }
-.suggestion-box { background:linear-gradient(135deg,color-mix(in srgb, var(--accent) 10%, var(--surface)),var(--surface)); border:1px solid color-mix(in srgb,var(--accent) 32%,var(--border)); border-radius:13px; padding:15px; font-size:.88rem; color:var(--text); line-height:1.55; white-space:pre-wrap; }
-.workspace-empty { background:var(--surface); border:1px dashed var(--border); border-radius:14px; padding:28px 20px; text-align:center; color:var(--muted); }.workspace-empty strong { display:block; color:var(--text); font-size:.95rem; margin-bottom:5px; }.notice-card { background:color-mix(in srgb,#f59e0b 13%,var(--surface)); border:1px solid color-mix(in srgb,#f59e0b 35%,var(--border)); border-radius:10px; padding:11px 13px; font-size:.82rem; color:var(--text); }
-[data-testid="stChatMessage"] { background:var(--surface); border:1px solid var(--border); border-radius:14px; margin-bottom:9px; box-shadow:0 5px 16px -13px var(--shadow); }
-.stTextArea textarea, .stTextInput input { background:var(--input) !important; color:var(--text) !important; border:1px solid var(--border) !important; border-radius:10px !important; font-size:.9rem !important; }.stTextArea textarea:focus, .stTextInput input:focus { border-color:var(--accent) !important; box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent) !important; }
-div.stButton > button { min-height:38px; border-radius:9px; font-weight:600; transition:transform .16s ease, box-shadow .16s ease; } div.stButton > button:hover { transform:translateY(-1px); box-shadow:0 8px 16px -10px var(--shadow); } div.stButton > button[kind="primary"] { background:var(--accent) !important; border-color:var(--accent) !important; color:#fff !important; } div.stButton > button[kind="primary"]:hover { background:var(--accent-hover) !important; border-color:var(--accent-hover) !important; }
-.stMarkdown, .stCaption, p, label { color:var(--text); }.stCaption, [data-testid="stCaptionContainer"] { color:var(--muted) !important; } [data-testid="stExpander"] { background:var(--surface); border:1px solid var(--border); border-radius:10px; }
-@media (max-width:760px) { .block-container { padding:1rem .8rem 2rem; }.app-header { padding:16px; align-items:flex-start; flex-direction:column; }.metrics-grid { grid-template-columns:1fr; } }
+[data-testid="stSidebar"] div.stButton > button { background:rgba(255,255,255,.08) !important; color:#fff !important; border-color:rgba(255,255,255,.2) !important; }
+[data-testid="stSidebar"] .stMetric { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.13); border-radius:5px; padding:9px; }
+[data-testid="stSidebar"] [data-testid="stMetricLabel"] p { color:#bdc8d8 !important; font-size:.68rem; text-transform:uppercase; letter-spacing:.04em; }
+[data-testid="stSidebar"] [data-testid="stMetricValue"] { color:#fff !important; font-size:1rem; }
+.block-container { padding-top:1.5rem; padding-bottom:2rem; max-width:1500px; }
+.app-header { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:18px 21px; background:var(--surface); color:var(--text); border:1px solid var(--border); border-top:3px solid var(--accent); border-radius:4px; margin-bottom:20px; box-shadow:0 2px 8px var(--shadow); }
+.app-header-title { font-size:1.28rem; font-weight:650; letter-spacing:-.02em; display:flex; align-items:center; gap:10px; }
+.app-header-subtitle { font-size:.82rem; color:var(--muted); margin-top:4px; }
+.brand-mark { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:4px; background:#e8eef5; color:#304760; font-size:.95rem; font-weight:700; }
+.status-pill { display:inline-flex; align-items:center; gap:7px; padding:5px 9px; background:#edf6f0; color:#286244; border:1px solid #cfe4d5; border-radius:3px; font-size:.72rem; font-weight:600; }
+.status-dot { width:7px; height:7px; background:#43855e; border-radius:50%; }
+.pro-card { background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:15px; margin-bottom:13px; box-shadow:0 1px 3px var(--shadow); }
+.pro-card-header { font-size:.70rem; font-weight:650; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; }
+.metrics-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:11px; }
+.metric-box { background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:9px 10px; min-width:0; }
+.metric-box-label, .score-tile-title { font-size:.64rem; font-weight:650; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+.metric-box-value { font-size:.88rem; font-weight:650; color:var(--text); margin-top:4px; overflow-wrap:anywhere; }
+.badge-pill { display:inline-block; padding:3px 7px; border-radius:3px; font-size:.67rem; font-weight:650; line-height:1.2; }
+.badge-green { background:#e8f3eb; color:#286244; }.badge-amber { background:#fff4dc; color:#805b13; }.badge-red { background:#fae9e8; color:#963b35; }.badge-blue { background:#e8f0f8; color:#365d83; }.badge-slate { background:#edf0f3; color:#52606d; }
+.coaching-banner { background:var(--surface-alt); border:1px solid var(--border); border-left:3px solid #8795a2; border-radius:3px; padding:11px 12px; margin-top:9px; font-size:.82rem; color:var(--text); line-height:1.5; }.coaching-banner-warning { border-left-color:#c28b32; }
+.score-container { display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; }.score-tile { flex:1; min-width:85px; background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:8px; text-align:center; }.score-tile-num { font-size:1rem; font-weight:650; color:var(--text); margin-top:4px; }
+.suggestion-box { background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:14px; font-size:.87rem; color:var(--text); line-height:1.55; white-space:pre-wrap; }
+.workspace-empty { background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:25px 18px; color:var(--muted); }.workspace-empty strong { display:block; color:var(--text); font-size:.92rem; margin-bottom:5px; }.notice-card { background:#fff7e8; border:1px solid #ead6a9; border-radius:3px; padding:11px 12px; font-size:.81rem; color:#5d4b28; }
+[data-testid="stChatMessage"] { background:var(--surface); border:1px solid var(--border); border-radius:4px; margin-bottom:8px; box-shadow:none; }
+.stTextArea textarea, .stTextInput input { background:var(--input) !important; color:var(--text) !important; border:1px solid var(--border) !important; border-radius:4px !important; font-size:.9rem !important; }.stTextArea textarea:focus, .stTextInput input:focus { border-color:var(--accent) !important; box-shadow:0 0 0 2px rgba(72,96,122,.12) !important; }
+div.stButton > button { min-height:37px; border-radius:4px; font-weight:600; } div.stButton > button[kind="primary"] { background:var(--accent) !important; border-color:var(--accent) !important; color:#fff !important; } div.stButton > button[kind="primary"]:hover { background:var(--accent-hover) !important; border-color:var(--accent-hover) !important; }
+.stCaption, [data-testid="stCaptionContainer"] { color:var(--muted) !important; } [data-testid="stExpander"] { background:var(--surface); border:1px solid var(--border); border-radius:4px; }
+@media (max-width:760px) { .block-container { padding:1rem .8rem 2rem; }.app-header { padding:15px; align-items:flex-start; flex-direction:column; }.metrics-grid { grid-template-columns:1fr; } }
 </style>
 """
 for key, value in theme.items():
@@ -199,8 +194,8 @@ state: ConversationState = st.session_state.state
 # 4. SIDEBAR: AGENT WORKSPACE CONTROLS
 # ==========================================
 with st.sidebar:
-    st.markdown("### Support Agent Panel")
-    st.caption("Nexora Technologies · Human-in-the-loop support")
+    st.markdown("### Nexora Support")
+    st.caption("Customer service workspace")
     st.caption(f"Signed in as: {current_user['username']} ({current_user['role']})")
     st.divider()
 
@@ -212,7 +207,7 @@ with st.sidebar:
         help="Choose the workspace appearance that is most comfortable for your environment.",
     )
 
-    st.markdown("**Active Session**")
+    st.markdown("**Current case**")
     st.code(st.session_state.session_id, language="text")
 
     col_s1, col_s2 = st.columns(2)
@@ -238,7 +233,7 @@ with st.sidebar:
     st.divider()
 
     # Past Sessions & SQLite Audit Explorer
-    st.markdown("#### Past Support Tickets")
+    st.markdown("#### Recent cases")
     past_sessions = repo.get_all_sessions(limit=15)
     if past_sessions:
         session_options = {s["session_id"]: f"{s['session_id']} · {s['created_at'][5:16]}" for s in past_sessions}
@@ -263,7 +258,7 @@ with st.sidebar:
 
             transcript_md = repo.export_session_markdown(selected_sid)
             st.download_button(
-                label="Export Audit Transcript (.md)",
+                label="Export case transcript",
                 data=transcript_md,
                 file_name=f"transcript_{selected_sid}.md",
                 mime="text/markdown",
@@ -280,19 +275,19 @@ st.markdown(f"""
 <div class="app-header">
     <div>
         <div class="app-header-title">
-            <span class="brand-mark">✦</span><span>AgentGuide AI</span>
+            <span class="brand-mark">N</span><span>Customer Support</span>
         </div>
         <div class="app-header-subtitle">
-            Nexora Technologies · AI-assisted guidance with human approval
+            Customer care workspace · Agent-reviewed responses
         </div>
     </div>
     <div style="text-align: right;">
         <div class="status-pill">
             <div class="status-dot"></div>
-            <span>Live Co-Pilot Active</span>
+            <span>Workspace ready</span>
         </div>
         <div style="font-size: 0.75rem; color: #94A3B8; margin-top: 4px;">
-            Secure workspace · Ticket: {st.session_state.session_id}
+            Case reference: {st.session_state.session_id}
         </div>
     </div>
 </div>
@@ -309,7 +304,7 @@ col_chat, col_guidance = st.columns([1.1, 0.9], gap="large")
 # LEFT COLUMN: LIVE CONVERSATION & INPUT
 # ==========================================
 with col_chat:
-    st.markdown("##### Conversation Stream")
+    st.markdown("##### Conversation")
     
     chat_container = st.container(height=360)
     with chat_container:
@@ -322,7 +317,7 @@ with col_chat:
             """, unsafe_allow_html=True)
         else:
             for msg in state.history:
-                avatar = "👤" if msg.is_customer() else "🎧"
+                avatar = "C" if msg.is_customer() else "A"
                 with st.chat_message(name=msg.speaker, avatar=avatar):
                     st.markdown(f"**{msg.speaker.capitalize()}** &nbsp; <span style='font-size:0.75rem; color:#94A3B8;'>{msg.timestamp[11:19]}</span>", unsafe_allow_html=True)
                     st.write(msg.text)
@@ -330,10 +325,10 @@ with col_chat:
                         st.image(msg.image_path, caption="Customer Attachment", width=220)
 
     # Customer Simulator Input Box
-    st.markdown("##### Incoming Customer Message")
+    st.markdown("##### Customer message")
     with st.form("customer_input_form", clear_on_submit=True):
         customer_text = st.text_area(
-            "Customer Message (English / Hindi / Telugu):",
+            "Customer message (English, Hindi or Telugu)",
             height=75,
             label_visibility="collapsed"
         )
@@ -341,12 +336,12 @@ with col_chat:
         c_upl1, c_upl2 = st.columns([2, 1])
         with c_upl1:
             uploaded_image = st.file_uploader(
-                "Attach Screenshot or Hardware Photo (Optional):",
+                "Add an image (optional)",
                 type=config.ALLOWED_IMAGE_TYPES,
                 label_visibility="collapsed"
             )
         with c_upl2:
-            submit_customer = st.form_submit_button("Receive Customer Message", type="primary", use_container_width=True, disabled=not can_manage_conversations)
+            submit_customer = st.form_submit_button("Analyze message", type="primary", use_container_width=True, disabled=not can_manage_conversations)
 
         if submit_customer:
             if customer_text.strip() or uploaded_image:
@@ -404,19 +399,20 @@ with col_chat:
 # RIGHT COLUMN: LIVE AI GUIDANCE & COPILOT
 # ==========================================
 with col_guidance:
-    st.markdown("##### Live AI Response Guidance")
+    st.markdown("##### Case overview")
 
     # Intelligence Metrics Card
     sentiment_badge = "badge-green" if state.sentiment == "POSITIVE" else ("badge-red" if state.sentiment == "NEGATIVE" else "badge-slate")
     urgency_badge = "badge-red" if state.urgency == "HIGH" else ("badge-amber" if state.urgency == "MEDIUM" else "badge-green")
     risk_badge = "badge-red" if state.escalation_risk == "HIGH" else ("badge-amber" if state.escalation_risk == "MEDIUM" else "badge-green")
     lang_display = config.SUPPORTED_LANGUAGES.get(state.language, state.language.upper())
+    sentiment_confidence = f"Sentiment confidence: {int(state.sentiment_confidence * 100)}%" if state.history else "Awaiting message"
 
     st.markdown(f"""
     <div class="pro-card">
         <div class="pro-card-header">
-            <span>Conversation Intelligence</span>
-            <span class="badge-pill badge-slate">Confidence: {int(state.sentiment_confidence * 100) if state.sentiment_confidence else 85}%</span>
+            <span>Message assessment</span>
+            <span class="badge-pill badge-slate">{sentiment_confidence}</span>
         </div>
         <div class="metrics-grid">
             <div class="metric-box">
@@ -469,7 +465,7 @@ with col_guidance:
         """, unsafe_allow_html=True)
 
     # Knowledge Base / RAG Section
-    st.markdown("##### Grounded Knowledge")
+    st.markdown("##### Reference material")
     if state.retrieved_sources:
         for idx, src in enumerate(state.retrieved_sources, 1):
             match_pct = int(src.get('similarity_score', 0) * 100)
@@ -490,10 +486,10 @@ with col_guidance:
     composer_text = st.session_state.get("agent_composer_textarea", "").strip() or st.session_state.agent_draft.strip()
     if composer_text:
         active_coaching = evaluate_agent_draft(composer_text, state)
-        coaching_title = "Response Quality Evaluation (Live Draft)"
+        coaching_title = "Draft feedback"
     else:
         active_coaching = state.coaching or generate_customer_context_coaching(state)
-        coaching_title = "Agent Coaching Advice"
+        coaching_title = "Handling guidance"
 
     st.markdown(f"##### {coaching_title}")
     if active_coaching:
@@ -517,12 +513,12 @@ with col_guidance:
             </div>
         </div>
         <div class="coaching-banner {'coaching-banner-warning' if ('defensive' in active_coaching.coaching_tip.lower() or 'apolog' in active_coaching.coaching_tip.lower()) else ''}">
-            <strong>Guidance:</strong> {active_coaching.coaching_tip}
+            <strong>Suggested approach:</strong> {active_coaching.coaching_tip}
         </div>
         """, unsafe_allow_html=True)
 
     # AI Suggested Response
-    st.markdown("##### Grounded Suggested Response")
+    st.markdown("##### Suggested reply")
     if state.suggested_response:
         st.markdown(f"""
         <div class="suggestion-box">
@@ -531,33 +527,33 @@ with col_guidance:
         """, unsafe_allow_html=True)
         
         st.write("")
-        if st.button("Use Suggested Draft in Composer", key="use_ai_suggestion", type="secondary", use_container_width=True):
+        if st.button("Use suggested reply", key="use_ai_suggestion", type="secondary", use_container_width=True):
             st.session_state.agent_draft = state.suggested_response
             st.session_state.agent_composer_textarea = state.suggested_response
             st.rerun()
     else:
-        st.caption("AI-generated draft responses will appear here as the conversation unfolds.")
+        st.caption("A suggested reply will appear after a customer message is analyzed.")
 
 
 # ==========================================
 # 7. BOTTOM PANEL: AGENT RESPONSE COMPOSER
 # ==========================================
 st.divider()
-st.markdown("#### Agent Response Composer")
-st.caption("Review, edit, or customize the drafted response before sending it to the customer.")
+st.markdown("#### Reply to customer")
+st.caption("Review and edit your reply before sending.")
 
 agent_text_input = st.text_area(
     "Response Draft:",
-    placeholder="Type response or click 'Use Suggested Draft in Composer' above to populate...",
+    placeholder="Write a reply to the customer…",
     height=95,
     key="agent_composer_textarea",
     label_visibility="collapsed"
 )
-st.caption(f"{len(agent_text_input.strip())} characters · The customer sees only the reply you approve and send.")
+st.caption(f"{len(agent_text_input.strip())} characters · Replies are recorded in the case history.")
 
 b_col1, b_col2, _ = st.columns([1.5, 1.5, 5])
 with b_col1:
-    if st.button("Send Response to Customer", type="primary", use_container_width=True, disabled=not can_manage_conversations):
+    if st.button("Add reply to case", type="primary", use_container_width=True, disabled=not can_manage_conversations):
         if agent_text_input.strip():
             state.add_message("agent", agent_text_input.strip())
             repo.log_turn(
@@ -566,7 +562,7 @@ with b_col1:
                 agent_message=agent_text_input.strip()
             )
             st.session_state.clear_agent_draft = True
-            st.success("Response sent to customer and logged to database.")
+            st.success("Reply added to the case history.")
             st.rerun()
         else:
             st.warning("Please enter a response before sending.")
